@@ -36,8 +36,11 @@ public class ArrayDeque{
 
     public void resizeUp() {
         int[]a = new int[size * 2];
-        System.arraycopy(items,0,a,0,size);
+        System.arraycopy(items,0,a,0,nextLast % items.length);
+        //System.arraycopy(items,nextFirst + 1,a,nextFirst+1 + size,items.length - nextFirst+1);
+        System.arraycopy(items, nextFirst + 1, a,nextFirst+1 + size,size - (nextFirst+1));
         items = a;
+        nextFirst += size;
     }
 
     // Adds an item of type int to the back of the deque.
@@ -54,7 +57,7 @@ public class ArrayDeque{
     // Removes and returns the item at the front of the deque. If no such item exists, returns null.
     // Constant time
     public int removeFirst() {
-        if (usageFactor < 0.25) {
+        if (items.length >= 16 && usageFactor < 0.25) {
             resizeDown();
         }
         int first = items[nextFirst + 1];
@@ -71,7 +74,7 @@ public class ArrayDeque{
     // Removes and returns the item at the back of the deque. If no such item exists, returns null.
     // Constant time
     public int removeLast() {
-        if (usageFactor < 0.25) {
+        if (items.length >= 16 && usageFactor < 0.25) {
             resizeDown();
         }
         int last = items[nextLast - 1];
@@ -115,12 +118,17 @@ public class ArrayDeque{
         list.addFirst(4);
         list.addFirst(5);
         list.addFirst(6);
-        System.out.println("nextFirst " + list.nextFirst);
+        list.addFirst(7);
+        list.addLast(8);
         list.printDeque();
-        list.removeLast();
-        System.out.println("nextFirst " + list.nextFirst);
-        list.addLast(2);
+        list.addFirst(10);
         list.printDeque();
+        list.addLast(9);
+        list.addFirst(2);
+        list.addFirst(3);
+        list.addFirst(4);
+        list.printDeque();
+
 
 
     }
