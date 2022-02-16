@@ -5,23 +5,21 @@ package deque;
  * @param
  */
 
-public class ArrayDeque{
+public class ArrayDeque<Thing>{
     private int size, nextFirst, nextLast;
-    private int[]items;
-    private double usageFactor;
+    private Thing[]items;
 
     // Creates empty linked list deque
     public ArrayDeque() {
-        items = new int[8];
+        items = (Thing[]) new Object[8];
         size = 0;
         nextFirst = 3;
         nextLast = 4;
-        usageFactor = size / items.length;
     }
 
     // Adds an item of type int to the front of the deque.
     // Constant time
-    public void addFirst(int item) {
+    public void addFirst(Thing item) {
         if (size == items.length) {
             this.resizeUp();
         }
@@ -34,36 +32,67 @@ public class ArrayDeque{
 
     }
 
-    public void resizeUp() {
-        int[]a = new int[size * 2];
-        System.arraycopy(items,0,a,0,nextLast % items.length);
-        //System.arraycopy(items,nextFirst + 1,a,nextFirst+1 + size,items.length - nextFirst+1);
-        System.arraycopy(items, nextFirst + 1, a,nextFirst+1 + size,size - (nextFirst+1));
-        items = a;
-        nextFirst += size;
-    }
-
     // Adds an item of type int to the back of the deque.
     // Constant time
-    public void addLast(int item) {
+    public void addLast(Thing item) {
         if (size == items.length) {
             this.resizeUp();
         }
-        items[nextLast % items.length] = item;
+        if (nextLast > 7) {
+            nextLast = 0;
+        }
+        items[nextLast] = item;
         nextLast++;
         size++;
     }
 
+    public void resizeUp() {
+//        int[]a = new int[size * 2];
+//        System.arraycopy(items,0,a,0,nextLast % items.length);
+//        //System.arraycopy(items,nextFirst + 1,a,nextFirst+1 + size,items.length - nextFirst+1);
+//        System.arraycopy(items, nextFirst + 1, a,nextFirst+1 + size,size - (nextFirst+1));
+//        items = a;
+//        nextFirst += size;
+    }
+
     // Removes and returns the item at the front of the deque. If no such item exists, returns null.
     // Constant time
-    public int removeFirst() {
+    public Thing removeLast() {
+        //resize
+        double usageFactor = 1.0 * size/items.length;
         if (items.length >= 16 && usageFactor < 0.25) {
             resizeDown();
         }
-        int first = items[nextFirst + 1];
-        items[nextFirst+1] = 0; //SET IT TO NULL WITH GENERICS
+        //out of bounds
+        if (nextLast == 0) {
+            nextLast = items.length;
+        }
+
+        Thing last = items[nextLast-1];
+        items[nextLast-1] = null;
+        nextLast--;
+        size--;
+        return last;
+    }
+
+    // Removes and returns the item at the back of the deque. If no such item exists, returns null.
+    // Constant time
+    public Thing removeFirst() {
+        // resize
+        double usageFactor = 1.0 * size/items.length;
+        if (items.length >= 16 && usageFactor < 0.25) {
+            resizeDown();
+        }
+        // out of bounds
+        if(nextFirst == items.length -1) {
+            nextFirst = -1;
+        }
+
+        Thing first = items[nextFirst + 1]; //CHANGE TO NULL
+        items[nextFirst + 1] = null;
         nextFirst++;
         size--;
+
         return first;
     }
 
@@ -71,63 +100,78 @@ public class ArrayDeque{
 
     }
 
-    // Removes and returns the item at the back of the deque. If no such item exists, returns null.
-    // Constant time
-    public int removeLast() {
-        if (items.length >= 16 && usageFactor < 0.25) {
-            resizeDown();
-        }
-        int last = items[nextLast - 1];
-        items[nextLast-1] = 0; //SET IT TO NULL WITH GENERICS
-        nextLast--;
-        size--;
-        return last;
-    }
 
     // Returns true if deque is empty, false otherwise.
     public boolean isEmpty() {
+
         return size == 0;
     }
 
     // Returns the number of items in the deque.
     // Constant time
     public int size() {
+
         return size;
     }
 
     // Gets the item at the given index. If no such item exists, returns null.
     // Uses iteration
-    public int get(int index) {
+    public Thing get(int index) {
+
         return items[index];
     }
 
     // Prints the items in the deque from first to last, separated by a space.
     public void printDeque() {
-        for(int item: items) {
+        for(Thing item: items) {
             System.out.print(item + " ");
         }
         System.out.println("");
     }
 
     public static void main (String[]args) {
-        ArrayDeque list = new ArrayDeque();
+        ArrayDeque<String> list = new ArrayDeque<>();
         System.out.println(list.isEmpty());
-        list.addLast(1);
-        list.addFirst(2);
-        list.addFirst(3);
-        list.addFirst(4);
-        list.addFirst(5);
-        list.addFirst(6);
-        list.addFirst(7);
-        list.addLast(8);
+//        list.addFirst(1);
+//        list.addFirst(2);
+//        list.addFirst(3);
+//        list.addFirst(4);
+//        list.addFirst(5);
+//        list.addFirst(6);
+//        list.addFirst(7);
+//        list.addFirst(8);
+
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+//        list.removeFirst();
+
+        list.addLast("emma");
+        list.addLast("emmy");
+        list.addLast("emz");
+        list.addLast("emzo");
+        list.addLast("emz2trappy");
+        list.addLast("emzino");
+        list.addLast("big m");
+        list.addLast("m money");
+
+        list.removeLast();
+        list.removeLast();
+        list.removeLast();
+        list.removeLast();
+
         list.printDeque();
-        list.addFirst(10);
-        list.printDeque();
-        list.addLast(9);
-        list.addFirst(2);
-        list.addFirst(3);
-        list.addFirst(4);
-        list.printDeque();
+
+
+
+
+
+
+
 
 
 

@@ -155,8 +155,8 @@ public class LinkedListDeque<Thing> {
         LinkedListDeque<String> L = new LinkedListDeque();
         L.addLast("hello");
         L.addLast("hi");
-        L.addLast("waddup");
-        L.addLast("yuhh");
+        L.addFirst("add first");
+        L.addLast("yuh");
         String last = L.removeLast();
 
         System.out.println(L.getRecursive(2));
