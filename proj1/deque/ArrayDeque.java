@@ -110,7 +110,9 @@ public class ArrayDeque<Thing>{
     // Returns the number of items in the deque.
     // Constant time
     public int size() {
-
+        if (size < 0) {
+            return 0;
+        }
         return size;
     }
 
@@ -163,6 +165,8 @@ public class ArrayDeque<Thing>{
         list.removeLast();
         list.removeLast();
         list.removeLast();
+
+        System.out.println(list.get(0));
 
         list.printDeque();
 
