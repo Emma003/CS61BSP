@@ -4,7 +4,7 @@ package deque;
  * @param
  */
 
-public class LinkedListDeque<Thing> {
+public class LinkedListDeque<Thing> implements Deque<Thing>{
 
     // Nested Node class
     private class Node {
@@ -32,6 +32,7 @@ public class LinkedListDeque<Thing> {
 
     // Adds an item of type int to the front of the deque.
     // Constant time
+    @Override
     public void addFirst(Thing item) {
         if (size == 0) {
             sentinel.next = new Node(sentinel, item, sentinel);
@@ -45,6 +46,7 @@ public class LinkedListDeque<Thing> {
 
     // Adds an item of type int to the back of the deque.
     // Constant time
+    @Override
     public void addLast(Thing item) {
         if (size == 0) {
             sentinel.next = new Node(sentinel, item, sentinel);
@@ -58,6 +60,7 @@ public class LinkedListDeque<Thing> {
 
     // Removes and returns the item at the front of the deque. If no such item exists, returns null.
     // Constant time
+    @Override
     public Thing removeFirst() {
         if (size == 0) {
             return null; // MAKE SURE TO RETURN NULL WHEN YOU CHANGE INT TO GENERIC TYPE
@@ -77,6 +80,7 @@ public class LinkedListDeque<Thing> {
 
     // Removes and returns the item at the back of the deque. If no such item exists, returns null.
     // Constant time
+    @Override
     public Thing removeLast() {
         if (size == 0) {
             return null; // MAKE SURE TO RETURN NULL WHEN YOU CHANGE INT TO GENERIC TYPE
@@ -94,22 +98,17 @@ public class LinkedListDeque<Thing> {
         return last;
     }
 
-    // Returns true if deque is empty, false otherwise.
-    public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        }
-        return false;
-    }
 
     // Returns the number of items in the deque.
     // Constant time
+    @Override
     public int size() {
         return size;
     }
 
     // Gets the item at the given index. If no such item exists, returns null.
     // Uses iteration
+    @Override
     public Thing get(int index) {
         if (index >= size || size == 0) {
             return null; // MAKE SURE TO RETURN NULL WHEN YOU CHANGE INT TO GENERIC TYPE
@@ -142,6 +141,7 @@ public class LinkedListDeque<Thing> {
     }
 
     // Prints the items in the deque from first to last, separated by a space.
+    @Override
     public void printDeque() {
         Node p = sentinel.next;
         while (p != sentinel) {

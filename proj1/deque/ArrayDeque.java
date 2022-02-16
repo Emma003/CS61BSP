@@ -5,7 +5,7 @@ package deque;
  * @param
  */
 
-public class ArrayDeque<Thing>{
+public class ArrayDeque<Thing> implements Deque<Thing>{
     private int size, nextFirst, nextLast;
     private Thing[]items;
 
@@ -19,6 +19,7 @@ public class ArrayDeque<Thing>{
 
     // Adds an item of type int to the front of the deque.
     // Constant time
+    @Override
     public void addFirst(Thing item) {
         if (size == items.length) {
             this.resizeUp();
@@ -34,6 +35,7 @@ public class ArrayDeque<Thing>{
 
     // Adds an item of type int to the back of the deque.
     // Constant time
+    @Override
     public void addLast(Thing item) {
         if (size == items.length) {
             this.resizeUp();
@@ -57,6 +59,7 @@ public class ArrayDeque<Thing>{
 
     // Removes and returns the item at the front of the deque. If no such item exists, returns null.
     // Constant time
+    @Override
     public Thing removeLast() {
         //resize
         double usageFactor = 1.0 * size/items.length;
@@ -77,6 +80,7 @@ public class ArrayDeque<Thing>{
 
     // Removes and returns the item at the back of the deque. If no such item exists, returns null.
     // Constant time
+    @Override
     public Thing removeFirst() {
         // resize
         double usageFactor = 1.0 * size/items.length;
@@ -101,14 +105,9 @@ public class ArrayDeque<Thing>{
     }
 
 
-    // Returns true if deque is empty, false otherwise.
-    public boolean isEmpty() {
-
-        return size == 0;
-    }
-
     // Returns the number of items in the deque.
     // Constant time
+    @Override
     public int size() {
         if (size < 0) {
             return 0;
@@ -118,12 +117,18 @@ public class ArrayDeque<Thing>{
 
     // Gets the item at the given index. If no such item exists, returns null.
     // Uses iteration
+    @Override
     public Thing get(int index) {
-
-        return items[index];
+        int firstIndex = nextFirst+1;
+//        if (firstIndex >= 8 || firstIndex + index >= 8) {
+//            firstIndex = 0;
+//        }
+        Thing item = items[(firstIndex+index) % items.length];
+        return item;
     }
 
     // Prints the items in the deque from first to last, separated by a space.
+    @Override
     public void printDeque() {
         for(Thing item: items) {
             System.out.print(item + " ");
@@ -152,22 +157,24 @@ public class ArrayDeque<Thing>{
 //        list.removeFirst();
 //        list.removeFirst();
 
-        list.addLast("emma");
-        list.addLast("emmy");
-        list.addLast("emz");
-        list.addLast("emzo");
-        list.addLast("emz2trappy");
+        list.addFirst("emma");
+        list.addFirst("emmy");
+        list.addFirst("emz");
+        list.addFirst("emzo");
+        list.addFirst("emz2trappy");
         list.addLast("emzino");
-        list.addLast("big m");
-        list.addLast("m money");
+        list.addLast("big-m");
+        list.addLast("m-money");
 
-        list.removeLast();
-        list.removeLast();
-        list.removeLast();
-        list.removeLast();
+        list.removeFirst();
+        list.removeFirst();
 
-        System.out.println(list.get(0));
+//        list.removeLast();
+//        list.removeLast();
+//        list.removeLast();
+//        list.removeLast();
 
+        System.out.println(list.get(5));
         list.printDeque();
 
 
