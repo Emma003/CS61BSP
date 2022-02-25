@@ -1,8 +1,7 @@
 package deque;
-
 import java.util.Comparator;
 
-public class MaxArrayDeque<Thing> extends ArrayDeque{
+public class MaxArrayDeque<Thing> extends ArrayDeque {
     public MaxArrayDeque(Comparator<Thing> c) {
 
     }
@@ -12,6 +11,8 @@ public class MaxArrayDeque<Thing> extends ArrayDeque{
         if (this.isEmpty()) {
             return null;
         }
+        Thing max = null;
+
 
         return null;
     }
@@ -22,6 +23,12 @@ public class MaxArrayDeque<Thing> extends ArrayDeque{
         }
 
         return null;
+    }
+
+    public static class ThingComparator<Thing extends Comparable<Thing>> implements Comparator<Thing> {
+        public int compare(Thing a, Thing b){
+            return a.compareTo(b);
+        }
     }
 
 

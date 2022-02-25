@@ -120,9 +120,6 @@ public class ArrayDeque<Thing> implements Deque<Thing>{
     @Override
     public Thing get(int index) {
         int firstIndex = nextFirst+1;
-//        if (firstIndex >= 8 || firstIndex + index >= 8) {
-//            firstIndex = 0;
-//        }
         Thing item = items[(firstIndex+index) % items.length];
         return item;
     }
