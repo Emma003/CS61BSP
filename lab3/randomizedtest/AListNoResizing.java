@@ -15,6 +15,8 @@ package randomizedtest;
 */
     //WHATCHU WANNA DO
 
+    //HI MY NAME IS SLIM SHADY
+
 public class AListNoResizing<Item> {
     private Item[] items;
     private int size;
