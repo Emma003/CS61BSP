@@ -14,6 +14,8 @@ package randomizedtest;
  size: The number of items in the list should be size.
 */
 
+    //HI MY NAME IS SLIM SHADY
+
 public class AListNoResizing<Item> {
     private Item[] items;
     private int size;
