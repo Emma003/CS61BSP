@@ -13,6 +13,7 @@ package randomizedtest;
  getLast: The item we want to return is in position size - 1
  size: The number of items in the list should be size.
 */
+    //WHATCHU WANNA DO
 
 public class AListNoResizing<Item> {
     private Item[] items;
