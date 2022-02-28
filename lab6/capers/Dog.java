@@ -66,7 +66,6 @@ public class Dog implements Serializable{ // TODO
             e.printStackTrace();
         }
         Utils.writeObject(newDog, this);
-        System.out.println(System.getProperty(this.name));
     }
 
     @Override

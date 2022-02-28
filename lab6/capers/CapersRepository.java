@@ -62,7 +62,7 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
-        Utils.writeContents(STORY, Utils.readContentsAsString(STORY) + text);
+        Utils.writeContents(STORY, Utils.readContentsAsString(STORY) + text + "\n");
         System.out.println(Utils.readContentsAsString(STORY));
     }
 
