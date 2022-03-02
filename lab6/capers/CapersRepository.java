@@ -17,10 +17,10 @@ import static capers.Utils.*;
  */
 public class CapersRepository {
     /** Current Working Directory. */
-    static final File CWD = new File(".");
+    static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = new File(CWD,"capers"); // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = new File(".capers"); // TODO Hint: look at the `join`
                                             //      function in Utils
 
     /** Story file */
@@ -37,6 +37,10 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
+        if(!CWD.exists()) {
+            CWD.mkdir();
+        }
+
         if(!CAPERS_FOLDER.exists()) {
             CAPERS_FOLDER.mkdir();
         }
