@@ -26,4 +26,39 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
     /* TODO: fill in the rest of this class. */
+
+    /**
+     * TODO: create gitlet repo
+     * TODO: make initial commit
+     * TODO: create the rest of the things needed in .gitlet
+     * TODO: FAIL if gitlet repo already exists
+     *
+     * .gitlet
+     *      InitialCommit
+     */
+    public void init() {
+        //Get CWD
+        if (!GITLET_DIR.exists()) {
+            GITLET_DIR.mkdir();
+        }
+
+        Commit initialCommit = new Commit();
+        File initialCommitFile = Utils.join(GITLET_DIR,initialCommit);
+        Utils.writeObject(initialCommitFile,initialCommit);
+
+
+    }
+
+
+    public void commit() {
+        // Read HEAD commit object and staging area
+
+        // Clone HEAD commit
+        // Modify its message and timestamp
+        // Use the staging area to modify the files tracked by the new commit
+
+        // Convert pointers
+
+        // Write back any new or modified object made into a new file
+    }
 }
