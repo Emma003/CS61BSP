@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 
+import static java.nio.file.Paths.get;
+
 
 /** Assorted utilities.
  *
@@ -195,7 +197,7 @@ class Utils {
      *  method.
      * @param first
      * @param others*/
-    static File join(File first, Commit others) {
+    static File join(String first, String others) {
         return Paths.get(first, others).toFile();
     }
 
@@ -203,6 +205,7 @@ class Utils {
      *  analogous to the {@link java.nio.file.Paths.#get(String, String[])}
      *  method. */
     static File join(File first, String... others) {
+
         return Paths.get(first.getPath(), others).toFile();
     }
 

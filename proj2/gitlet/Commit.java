@@ -72,4 +72,8 @@ public class Commit implements Serializable {
     public Date getDate() {
         return this.timestamp;
     }
+
+    public String hash() {
+        return Utils.sha1(this);
+    }
 }
