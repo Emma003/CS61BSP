@@ -7,6 +7,8 @@ from os import chdir, environ, getcwd, mkdir, remove, access, W_OK
 from shutil import copyfile, rmtree
 from math import log
 
+
+
 SHORT_USAGE = """\
 Usage: python3 tester.py OPTIONS TEST.in ...
 
@@ -440,6 +442,7 @@ if __name__ == "__main__":
         JAVA_COMMAND = 'exec ' + JAVA_COMMAND
 
     num_tests = len(files)
+
     errs = 0
     fails = 0
 
@@ -458,7 +461,11 @@ if __name__ == "__main__":
     print()
     print("Ran {} tests. ".format(num_tests), end="")
     if errs == fails == 0:
+            #delete this 
+        print(len(files))
         print("All passed.")
     else:
         print("{} passed.".format(num_tests - errs - fails))
         sys.exit(1)
+    
+

@@ -21,7 +21,7 @@ Creates a commit object with metadata + hashmap containing files tracked by that
 ### COMMIT TREE
 #### Fields
 1. commitHistory: TreeMap <hashcode, Commit object>
-2. Field 2
+2. splitPoint: file containing split point commit id
 
 
 ### REPOSITORY
@@ -62,22 +62,24 @@ Creates a Blob object from file content and gets its hashcode
 2. saveCommit(): creates new persistent file of commit object with hash code as name (similar to saveDog() in capers)
 3. returnCommit(): returns deserialized commit object 
 4. getHash(): returns hash code of any commit object
-5. 
+5. equals(): compares two commits (by their id)
 
 ### COMMIT TREE
 1. find(): prints out ids of all commits with given message 
 2. log(): prints commit info history
-3. globalLog():
+3. globalLog()
 4. checkout() [first checkout]
 5. checkout() [second checkout]
-6. 
+6. reset()
+7. merge(): merges files from given branch to current branch
+8. returnBranch(): returns the name of the current branch
 
 
 ### REPOSITORY
 1. init(): creates new repo
 2. commit(): calls saveCommit()
 3. branch(): creates new branch file (same HEAD commit pointer)
-4. rm-branch(): deletes the file(commit pointer) with the given name
+4. rm-branch(): deletes the file (commit pointer) with the given name
 5. checkout() [third checkout]
 
 
@@ -88,8 +90,24 @@ Creates a Blob object from file content and gets its hashcode
 1. add()
 2. rm()
 3. status()
-4. saveStage(): serializes the index file after it's been modified (helper)
-5. returnStage(): returns deserialized index file into a stage object (helper)
+4. clearStagingArea()
+5. saveStage(): serializes the index file after it's been modified (helper)
+6. returnStage(): returns deserialized index file into a stage object (helper)
+
+###UTILS [PROVIDED]
+1. sha1(): returns hash code
+2. restrictedDelete(): Deletes FILE if it exists and is not a directory
+3. readContents(): returns contents of file as byte array
+4. readContentsAsString(): returns entire contents of file as a String
+5. writeContents(): writes the result of concatenating the bytes in CONTENTS to FILE
+6. readObject(): returns an object of type T read from file
+7. writeObject(): write OBJ to FILE
+8. plainFilenamesIn(): returns a list of the names of all plain files in the directory DIR
+9. join(): returns the concatenation of FIRST and OTHERS into a File designator
+10. error(): returns a GitletException (error)
+11. message(): prints a message composed from MSG and ARGS
+
+
 
 ## Persistence
 

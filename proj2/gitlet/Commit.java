@@ -34,7 +34,10 @@ public class Commit implements Serializable {
     private Date timestamp;
     /** The parent of this Commit. */
     private String parent;
+    /** The id of this Commit. */
+    private String id;
     /** The files tracked in this Commit. */
+
     /** TODO: add a data structure that contains/tracks the files */
 
     /* TODO: fill in the rest of this class. */
@@ -44,6 +47,8 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.parent = null;
         this.timestamp = new Date(0); // epoch date TODO: verify this w/ print statement
+        String idtext = "commit" + parent + message;
+        this.id = Utils.sha1(idtext);
     }
 
 
@@ -74,6 +79,6 @@ public class Commit implements Serializable {
     }
 
     public String hash() {
-        return Utils.sha1(this);
+        return this.id;
     }
 }

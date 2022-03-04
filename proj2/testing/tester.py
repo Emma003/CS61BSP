@@ -6,7 +6,6 @@ from getopt import getopt, GetoptError
 from os import chdir, environ, getcwd, mkdir, remove, access, W_OK
 from shutil import copyfile, rmtree
 from math import log
-from __future__ import print_function
 
 SHORT_USAGE = """\
 Usage: python3 tester.py OPTIONS TEST.in ...
