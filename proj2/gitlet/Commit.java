@@ -2,8 +2,12 @@ package gitlet;
 
 // TODO: any imports you need here
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
+
+import static gitlet.Utils.join;
 
 /** Represents a gitlet commit object.
  *
@@ -22,6 +26,7 @@ import java.util.Date; // TODO: You'll likely use this in this class
 public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
+     * TODO: MAKE SURE TO READ THE TREEMAP DOCUMENTATION, THERE'S A BUNCH OF USEFUL METHOD IT IMPLEMENTS!!!!
      *
      * List all instance variables of the Commit class here with a useful
      * comment above them describing what that variable represents and how that
@@ -36,6 +41,8 @@ public class Commit implements Serializable {
     private String parent;
     /** The id of this Commit. */
     private String id;
+    /** Is the commit a merge commit. */
+    private boolean isMergeCommit;
     /** The files tracked in this Commit. */
 
     /** TODO: add a data structure that contains/tracks the files */
@@ -47,6 +54,7 @@ public class Commit implements Serializable {
         this.message = "initial commit";
         this.parent = null;
         this.timestamp = new Date(0); // epoch date TODO: verify this w/ print statement
+        this.isMergeCommit = false;
         String idtext = "commit" + parent + message;
         this.id = Utils.sha1(idtext);
     }
@@ -60,6 +68,16 @@ public class Commit implements Serializable {
             this.timestamp = null;
         }
 
+    }
+
+    public void saveCommit() {
+        File commitFile = join(Repository.OBJECTS, id);
+        try {
+            commitFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Utils.writeObject(commitFile,this);
     }
 
     public String getParent() {

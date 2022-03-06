@@ -15,14 +15,12 @@ Creates a commit object with metadata + hashmap containing files tracked by that
 1. message: String
 2. timestamp: String 
 3. parent ID: String
-4. filesInCommit: HashMap<filename, blob id>
-
+4. isMergeCommit: boolean
+5. filesInCommit: TreeMap<filename, blob id>
 
 ### COMMIT TREE
 #### Fields
-1. commitHistory: TreeMap <hashcode, Commit object>
-2. splitPoint: file containing split point commit id
-
+1. commitHistory: TreeMap<hashcode, Commit object>
 
 ### REPOSITORY
 #### Fields
@@ -32,11 +30,11 @@ Creates a commit object with metadata + hashmap containing files tracked by that
 4. refs: subdirectory containing branch files (each file contains current commit id)
 
 ### BLOB
-Creates a Blob object from file content and gets its hashcode 
+Creates a Blob object from file content and gets its hashcode
 #### Fields
 1. filename
 2. hashcode
-
+3. contents
 
 ### STAGE
 #### Fields
@@ -53,6 +51,8 @@ Creates a Blob object from file content and gets its hashcode
 
 
 ## Algorithms
+
+
 ### MAIN
 1. switch/case blocks: call appropriate methods
 2. validateNumArguments(): check for number of args (see capers.Main)
@@ -63,6 +63,7 @@ Creates a Blob object from file content and gets its hashcode
 3. returnCommit(): returns deserialized commit object 
 4. getHash(): returns hash code of any commit object
 5. equals(): compares two commits (by their id)
+6. getContent(): returns the blob id of a commit given its filename 
 
 ### COMMIT TREE
 1. find(): prints out ids of all commits with given message 
@@ -72,27 +73,33 @@ Creates a Blob object from file content and gets its hashcode
 5. checkout() [second checkout]
 6. reset()
 7. merge(): merges files from given branch to current branch
-8. returnBranch(): returns the name of the current branch
+8. findSplit(): returns the commit id of the split point (uses LCA algorithm)
+9. createConflictFile(): returns a file that contains merge conflict results
+10. caseMerge(): takes the split, HEAD and branch commits returns an int that indicates what merge situation we're in
 
 
 ### REPOSITORY
 1. init(): creates new repo
 2. commit(): calls saveCommit()
 3. branch(): creates new branch file (same HEAD commit pointer)
-4. rm-branch(): deletes the file (commit pointer) with the given name
-5. checkout() [third checkout]
+4. switchBranch(): changes the HEAD file to point to the current branch
+4. rm-branch(): deletes the branch with the given name
+5. currentBranch(): returns the name of the current branch
+6. checkout() [third checkout]
 
 
 ### BLOB
 1. getHash(): returns hash code of any commit object
+2. equals(): returns t/f
 
 ### STAGE
 1. add()
 2. rm()
 3. status()
 4. clearStagingArea()
-5. saveStage(): serializes the index file after it's been modified (helper)
-6. returnStage(): returns deserialized index file into a stage object (helper)
+5. removeFromStagingArea()
+6. saveStage(): serializes the index file after it's been modified 
+7. returnStage(): returns deserialized index file into a stage object
 
 ###UTILS [PROVIDED]
 1. sha1(): returns hash code
@@ -105,9 +112,14 @@ Creates a Blob object from file content and gets its hashcode
 8. plainFilenamesIn(): returns a list of the names of all plain files in the directory DIR
 9. join(): returns the concatenation of FIRST and OTHERS into a File designator
 10. error(): returns a GitletException (error)
-11. message(): prints a message composed from MSG and ARGS
+11. message(): prints a message composed of MSG and ARGS
 
 
 
 ## Persistence
-
+1. index file: stores all info about the staging area: added/removed files, untracked files, untracked but unmodified files...
+2. HEAD file: contains a path to the current branch 
+3. branches folder: contains branch files with commit id's of each head 
+4. commit files: each commit object will be serialized into a file named after the commit's id
+5. commit tree: contains an id to commit mapping of the commit history
+6. blob files:  stores the serialized content of files

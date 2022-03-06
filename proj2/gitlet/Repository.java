@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,17 +28,20 @@ public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The staging area for addition (filename, blob ID)*/
-    public static Map<String,String> additionStagingArea = new HashMap<>();
-    /** The staging area for removal (filename, blob ID)*/
-    public static Map<String,String> removalStagingArea = new HashMap<>();
+    /** Subdirectory for objects (commits and blobs) */
+    public static final File OBJECTS = join(GITLET_DIR, "objects");
+    /** Subdirectory for branches */
+    public static final File BRANCHES = join(GITLET_DIR, "branches");
+    /** HEAD file */
+    public static final File HEAD = join(GITLET_DIR, "HEAD.txt");
+    /** master file */
+    public static final File MASTER = join(BRANCHES, "master.txt");
 
-    /* TODO: fill in the rest of this class. */
 
     /**
      * INIT COMMAND
      * TODO: create gitlet repo
-     * TODO: make initial commit (save it with its hash code)
+     * TODO: make initial commit (save it with its hash code) with commit message "initial commit"
      * TODO: create master and HEAD pointer and have it point to initial commit
      * TODO: create the rest of the things needed in .gitlet
      * TODO: FAIL if gitlet repo already exists
@@ -47,33 +51,43 @@ public class Repository {
      *      InitialCommit hashcode
      */
     public static void init() {
-        //Get CWD
-        if (!GITLET_DIR.exists()) {
-            GITLET_DIR.mkdir();
-        } else {
+        // Failure case
+        if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             return;
         }
 
+        // Making initial directories and files
+        GITLET_DIR.mkdir(); OBJECTS.mkdir(); BRANCHES.mkdir();
+
+        // Initial commit file
         Commit initialCommit = new Commit();
-        String initialHashcode = initialCommit.hash();
-        File initialCommitFile = join(GITLET_DIR, initialHashcode);
-        Utils.writeObject(initialCommitFile,initialCommit);
+        initialCommit.saveCommit();
+
+        //HEAD file with path to current branch
+        try {
+            HEAD.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Utils.writeContents(HEAD, "branches/master");
+
+        //MASTER file with initial commit id
+        try {
+            MASTER.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Utils.writeContents(MASTER, initialCommit.hash());
 
     }
 
-    /**
-     * TODO: add file to staging area
-     * TODO: overwrite previous staging area entry if its the same file being staged
-     * TODO: implement persistence for the staging area (save hashmap in file)
-     * TODO: avoid adding to staging area if its the same version as the current commit
-     * TODO: remove file from staging area if it's the same version as current commit
-     * TODO: FAIL: file doesn't exist
-     * @param filename
-     */
-    public static void add (String filename) {
-
+    public static void switchBranch(String newBranch) {
+        Utils.writeContents(HEAD, "branches/" + newBranch);
     }
+
+
+
 
     /**
      * TODO:Read HEAD commit object and staging area
