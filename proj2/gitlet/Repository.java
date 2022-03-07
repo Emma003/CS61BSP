@@ -158,9 +158,27 @@ public class Repository {
         // Write in pointer to current commit
         String currentCommitID = CommitTree.currentCommit();
         Utils.writeContents(BRANCH, currentCommitID);
+    }
 
-        // Update HEAD commit
-        Utils.writeContents(HEAD,branchName);
+    public static void rmBranch(String branchName) {
+        // Removing non-existent branch [FAILURE CASE]
+        List<String> branches = Utils.plainFilenamesIn(BRANCHES);
+        if (!branches.contains(branchName)) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+
+        // Removing current branch [FAILURE CASE]
+        String currentBranch = Utils.readContentsAsString(HEAD);
+        if(currentBranch.equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            return;
+        }
+
+        // Delete branch file from branch folder
+        File removedBranch = Utils.join(BRANCHES, branchName);
+        removedBranch.delete();
+
     }
 
     public static void checkoutBranch(String branch) {

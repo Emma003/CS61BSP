@@ -113,9 +113,10 @@ public class Stage implements Serializable {
         if (currentCommit.getFiles() == null) {
             System.out.println("No reason to remove the file.");
             return;
+        }
 
         // File isn't tracked or staged [FAILURE CASE]
-        } else if (!currentCommit.getFiles().containsKey(filename) && !additionStage.containsKey(filename)) {
+        if (!currentCommit.getFiles().containsKey(filename) && !additionStage.containsKey(filename)) {
             System.out.println("No reason to remove the file.");
             return;
         }

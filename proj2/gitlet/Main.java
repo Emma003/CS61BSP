@@ -58,13 +58,17 @@ public class Main {
                 } else {
                     System.out.println("Please enter the right amount of arguments.");
                 }
+                break;
             case "branch":
                 if (args.length == 2) {
                     Repository.newBranch(args[1]);
                 } else {
                     System.out.println("Please enter branch name");
                 }
-
+                break;
+            case "rm-branch":
+                Repository.rmBranch(args[1]);
+                break;
         }
     }
 }
