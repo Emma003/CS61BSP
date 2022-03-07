@@ -1,6 +1,28 @@
 package gitlet;
 
+import java.io.File;
+
 public class CommitTree {
+
+
+    /**
+     * @return string id of current HEAD commit
+     */
+    public static String currentCommit() {
+        String currentBranch = Utils.readContentsAsString(Repository.HEAD);
+        File branchFile = Utils.join(Repository.BRANCHES, currentBranch);
+        return Utils.readContentsAsString(branchFile);
+    }
+
+    /** TODO: TEST THIS (ADD MERGE CASE LATER)*/
+    public static void log(String commitID) {
+        if (commitID == null) {
+            return;
+        }
+        Commit currentCommit = Commit.returnCommit(commitID);
+        System.out.println(currentCommit.toString());
+        log(currentCommit.getParent());
+    }
 
 
 
@@ -18,4 +40,6 @@ public class CommitTree {
          * TODO: watch graph traversal videos / look up LCA algorithms in java
          */
     }
+
+
 }

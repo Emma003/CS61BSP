@@ -6,16 +6,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date; // TODO: You'll likely use this in this class
+import java.util.HashMap;
+import java.util.TreeMap;
 
 import static gitlet.Utils.join;
 
 /** Represents a gitlet commit object.
- *
- * Combinations of log messages, other metadata (commit date, author, etc.), a reference
- * to a tree, and references to parent commits. The repository also maintains a mapping
- * from branch heads to references to commits, so that certain important commits have
- * symbolic names.
- *
  *
  *
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -27,11 +23,6 @@ public class Commit implements Serializable {
     /**
      * TODO: add instance variables here.
      * TODO: MAKE SURE TO READ THE TREEMAP DOCUMENTATION, THERE'S A BUNCH OF USEFUL METHOD IT IMPLEMENTS!!!!
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
     /** The message of this Commit. */
     private String message;
@@ -44,8 +35,7 @@ public class Commit implements Serializable {
     /** Is the commit a merge commit. */
     private boolean isMergeCommit;
     /** The files tracked in this Commit. */
-
-    /** TODO: add a data structure that contains/tracks the files */
+    private TreeMap<String,String> filesInCommit;
 
     /* TODO: fill in the rest of this class. */
 
@@ -71,7 +61,7 @@ public class Commit implements Serializable {
     }
 
     public void saveCommit() {
-        File commitFile = join(Repository.OBJECTS, id);
+        File commitFile = Utils.join(Repository.COMMITS, id);
         try {
             commitFile.createNewFile();
         } catch (IOException e) {
@@ -80,12 +70,37 @@ public class Commit implements Serializable {
         Utils.writeObject(commitFile,this);
     }
 
+    public static Commit returnCommit(String filename) {
+        File commitFile = Utils.join(Repository.COMMITS, filename);
+        return Utils.readObject(commitFile, Commit.class);
+    }
+
+    /**
+     * Returns true if the file passed as parameter is the same version as in this commit
+     * @param filename
+     * @param blob
+     * @return
+     */
+    public boolean isCommitVersion(String filename, String blob) {
+        if (filesInCommit.keySet().contains(filename)) {
+            if(filesInCommit.get(filename) == blob) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void addFilesToCommit(HashMap<String,String> files) {
+
+    }
+
     public String getParent() {
         return parent;
     }
 
-    public String getFiles() {
-        return null;
+    public TreeMap<String, String> getFiles() {
+        return filesInCommit;
     }
 
     public String getMessage() {
@@ -98,5 +113,10 @@ public class Commit implements Serializable {
 
     public String hash() {
         return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "=== \ncommit " + this.id + "\nDate: " + this.timestamp.toString() + "\n" + this.message;
     }
 }

@@ -17,7 +17,7 @@ public class Blob {
     }
 
     public void saveBlob(){
-        File blobFile = join(Repository.OBJECTS, id);
+        File blobFile = join(Repository.BLOBS, id);
         try {
             blobFile.createNewFile();
         } catch (IOException e) {

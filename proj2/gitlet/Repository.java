@@ -3,6 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static gitlet.Utils.*;
@@ -16,20 +17,15 @@ import static gitlet.Utils.*;
  *  @author TODO
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** Subdirectory for objects (commits and blobs) */
-    public static final File OBJECTS = join(GITLET_DIR, "objects");
+    /** Subdirectory for commits */
+    public static final File COMMITS = join(GITLET_DIR, "commits");
+    /** Subdirectory for blobs */
+    public static final File BLOBS = join(GITLET_DIR, "blobs");
     /** Subdirectory for branches */
     public static final File BRANCHES = join(GITLET_DIR, "branches");
     /** HEAD file */
@@ -39,12 +35,7 @@ public class Repository {
 
 
     /**
-     * INIT COMMAND
-     * TODO: create gitlet repo
-     * TODO: make initial commit (save it with its hash code) with commit message "initial commit"
-     * TODO: create master and HEAD pointer and have it point to initial commit
-     * TODO: create the rest of the things needed in .gitlet
-     * TODO: FAIL if gitlet repo already exists
+     * TODO: TEST THIS
      *
      * Directory map:
      * .gitlet
@@ -58,7 +49,7 @@ public class Repository {
         }
 
         // Making initial directories and files
-        GITLET_DIR.mkdir(); OBJECTS.mkdir(); BRANCHES.mkdir();
+        GITLET_DIR.mkdir(); COMMITS.mkdir(); BLOBS.mkdir(); BRANCHES.mkdir();
 
         // Initial commit file
         Commit initialCommit = new Commit();
@@ -70,7 +61,7 @@ public class Repository {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Utils.writeContents(HEAD, "branches/master");
+        Utils.writeContents(HEAD, "master");
 
         //MASTER file with initial commit id
         try {
@@ -80,11 +71,73 @@ public class Repository {
         }
         Utils.writeContents(MASTER, initialCommit.hash());
 
+        //empty INDEX file
+        try {
+            Stage.INDEX.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public static void switchBranch(String newBranch) {
-        Utils.writeContents(HEAD, "branches/" + newBranch);
+        Utils.writeContents(HEAD, newBranch);
     }
+
+    public static void add(String filename) {
+        Stage index = Stage.returnIndex();
+        index.add(filename);
+        Stage.saveIndex(index);
+    }
+
+    public static void rm(String filename) {
+        Stage index = Stage.returnIndex();
+        index.rm(filename);
+        Stage.saveIndex(index);
+    }
+
+    /** TODO: TEST THIS */
+    public static void log() {
+        String currentCommitID = CommitTree.currentCommit();
+        CommitTree.log(currentCommitID);
+    }
+
+    /** TODO: TEST THIS */
+    public static void globalLog() {
+        List<String> cwdFiles = Utils.plainFilenamesIn(COMMITS);
+        for (String commitID: cwdFiles) {
+            Commit commit = Commit.returnCommit(commitID);
+            System.out.println(commit.toString());
+        }
+
+    }
+
+    /** TODO: TEST THIS */
+    public static void find(String message) {
+        // Adding all commit filenames into a list
+        List<String> cwdFiles = Utils.plainFilenamesIn(COMMITS);
+        boolean found = false;
+
+        // Iterating over commits folder
+        for (String commitID: cwdFiles) {
+            Commit commit = Commit.returnCommit(commitID);
+            if (commit.getMessage().equals(message)) {
+                System.out.println(commit.hash());
+                found = true;
+            }
+        }
+
+        if (found == false) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
+    public static void status() {
+        Stage index = Stage.returnIndex();
+        index.printStatus();
+        Stage.saveIndex(index);
+    }
+
 
 
 
@@ -103,14 +156,5 @@ public class Repository {
      * TODO: FAIL: no staged files, no commit message
      */
     public void commit() {
-        // Read HEAD commit object and staging area
-
-        // Clone HEAD commit
-        // Modify its message and timestamp
-        // Use the staging area to modify the files tracked by the new commit
-
-        // Convert pointers
-
-        // Write back any new or modified object made into a new file
     }
 }

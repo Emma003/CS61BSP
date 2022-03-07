@@ -22,9 +22,16 @@ public class Main {
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
-                Stage.add(args[1]);
+                Repository.add(args[1]);
                 break;
-            // TODO: FILL THE REST IN
+            case "rm":
+                Repository.rm(args[1]);
+            case "log":
+                Repository.log();
+            case "global-log":
+                Repository.globalLog();
+            case "find":
+
         }
     }
 }

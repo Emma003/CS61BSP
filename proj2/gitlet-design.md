@@ -9,8 +9,8 @@ Takes and verifies user input
 #### Fields
 1. None?
 
-### COMMIT
-Creates a commit object with metadata + hashmap containing files tracked by that commit
+### COMMIT (Serializable)
+Creates a commit object with metadata + treemap containing files tracked by that commit
 #### Fields
 1. message: String
 2. timestamp: String 
@@ -19,34 +19,38 @@ Creates a commit object with metadata + hashmap containing files tracked by that
 5. filesInCommit: TreeMap<filename, blob id>
 
 ### COMMIT TREE
+Handles functions related to the commit history including commit, merge, checkout, reset, log
 #### Fields
 1. commitHistory: TreeMap<hashcode, Commit object>
+2. splitPoint: String 
 
 ### REPOSITORY
+Handles operations related to the status of the repo and the CWD
 #### Fields
 1. CWD: directory
 2. gitlet repository: directory
-3. HEAD: file containing path to current commit
-4. refs: subdirectory containing branch files (each file contains current commit id)
+3. HEAD: file containing path to current branch
+4. MASTER: file containing id of current commit 
+4. BRANCHES: subdirectory containing branch files (each file contains current commit id)
+5. COMMITS: subdirectory containing blobs and commits 
+6. BLOBS: : subdirectory containing blobs
 
-### BLOB
+### BLOB (Serializable)
 Creates a Blob object from file content and gets its hashcode
 #### Fields
 1. filename
 2. hashcode
 3. contents
 
-### STAGE
+### STAGE (Serializable)
+Handles funcitons related to the staging area (add, rm, status...)
 #### Fields
 1. additionStage: HashMap<filename, hashcode>: staging area for addition
 2. removalStage: HashMap<filename, hashcode>: staging area for removal
 3. modifiedTrackedFiles: HashMap<filename, hashcode>: tracked files that were modified but not staged for commit
 4. trackedFiles: HashMap<filename, hashcode>: all files that have ever been committed
-5. untrackedFiles: HashMap<filename, hashcode>: filed in CWD that aren't staged or committed
+5. untrackedFiles: ArrayList<String>: filed in CWD that aren't staged or committed
 6. index: serialized file containing all info about the staging area
-
-
-
 
 
 
@@ -64,6 +68,7 @@ Creates a Blob object from file content and gets its hashcode
 4. getHash(): returns hash code of any commit object
 5. equals(): compares two commits (by their id)
 6. getContent(): returns the blob id of a commit given its filename 
+7. isCommitVersion(): returns true is file is the same version as this commit
 
 ### COMMIT TREE
 1. find(): prints out ids of all commits with given message 
@@ -75,7 +80,8 @@ Creates a Blob object from file content and gets its hashcode
 7. merge(): merges files from given branch to current branch
 8. findSplit(): returns the commit id of the split point (uses LCA algorithm)
 9. createConflictFile(): returns a file that contains merge conflict results
-10. caseMerge(): takes the split, HEAD and branch commits returns an int that indicates what merge situation we're in
+10. caseMerge(): takes the split, HEAD and branch commit files and returns an int that indicates what merge situation we're in
+11. currentCommit(): returns the id of the current commit
 
 
 ### REPOSITORY
@@ -89,8 +95,8 @@ Creates a Blob object from file content and gets its hashcode
 
 
 ### BLOB
-1. getHash(): returns hash code of any commit object
-2. equals(): returns t/f
+1. Blob(String filename, String contents): contructor writes "blob" + filename + contentsOfFile into the contents instant variable and calls sha1(contents)
+2. saveBlob(): saves blob as a serialized file with the hashcode as its file name
 
 ### STAGE
 1. add()
@@ -98,8 +104,9 @@ Creates a Blob object from file content and gets its hashcode
 3. status()
 4. clearStagingArea()
 5. removeFromStagingArea()
-6. saveStage(): serializes the index file after it's been modified 
-7. returnStage(): returns deserialized index file into a stage object
+6. saveIndex(): serializes the index file after it's been modified 
+7. returnIndex(): returns deserialized index file into a stage object
+8. getUntrackedFiles()
 
 ###UTILS [PROVIDED]
 1. sha1(): returns hash code
