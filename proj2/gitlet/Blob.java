@@ -2,18 +2,20 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 import static gitlet.Utils.join;
 
-public class Blob {
+public class Blob implements Serializable {
     public String filename;
     public String id;
     public String contents;
 
     public Blob(String filename, String contents) {
         this.filename = filename;
-        this.contents = "blob" + filename + contents;
-        this.id = Utils.sha1(contents);
+        this.contents = contents;
+        String idtext = "blob" + filename + contents;
+        this.id = Utils.sha1(idtext);
     }
 
     public void saveBlob(){
@@ -24,5 +26,14 @@ public class Blob {
             e.printStackTrace();
         }
         Utils.writeObject(blobFile,contents);
+    }
+
+    /**
+     * Returns blob content at a string given blob id
+     * */
+    public static String returnBlob(String BlobID) {
+        File inFile = join(Repository.BLOBS, BlobID);
+        String blobContents = Utils.readObject(inFile,String.class);
+        return blobContents;
     }
 }

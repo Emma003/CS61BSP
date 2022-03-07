@@ -49,9 +49,11 @@ public class Main {
                 Repository.status();
                 break;
             case "checkout":
-                if (args.length == 1) {
-                    Repository.checkoutBranch(args[1]);
-                } else if (args.length == 2) {
+                if (args.length == 2) {
+                    Stage index = Stage.returnIndex();
+                    Repository.checkoutBranch(args[1], index);
+                    Stage.saveIndex(index);
+                } else if (args.length == 3) {
                     CommitTree.checkoutFile(args[2]);
                 } else if (args.length == 4) {
                     CommitTree.checkoutCommitFile(args[1],args[3]);
@@ -68,6 +70,11 @@ public class Main {
                 break;
             case "rm-branch":
                 Repository.rmBranch(args[1]);
+                break;
+            case "reset":
+                Stage index = Stage.returnIndex();
+                Repository.reset(args[1], index);
+                Stage.saveIndex(index);
                 break;
         }
     }

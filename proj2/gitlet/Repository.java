@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static gitlet.Utils.*;
 
@@ -181,9 +182,108 @@ public class Repository {
 
     }
 
-    public static void checkoutBranch(String branch) {
+    public static void checkoutBranch(String branch, Stage index) {
+        // Checking out non-existent branch [FAILURE CASE]
+        List<String> branches = Utils.plainFilenamesIn(BRANCHES);
+        if (!branches.contains(branch)) {
+            System.out.println("No such branch exists.");
+            return;
+        }
+
+        // Checking out current branch [FAILURE CASE]
+        String currentBranch = CommitTree.currentBranch();
+        if(currentBranch.equals(branch)) {
+            System.out.println("No need to checkout the current branch.");
+            return;
+        }
+
+        // A CWD file is untracked and is about to be overwritten by checkout [FAILURE CASE]
+        List<String> cwdFiles = Utils.plainFilenamesIn(CWD);
+        List<String> untrackedFiles = index.getUntrackedFiles();
+        for (String file: cwdFiles) {
+            if (untrackedFiles.contains(file)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
+        }
+
+        // Get commit at the head of the given branch
+        File branchFile = Utils.join(Repository.BRANCHES, branch);
+        String headCommitID = Utils.readContentsAsString(branchFile);
+        Commit headCommitAtBranch = Commit.returnCommit(headCommitID);
+
+        // Put every tracked file in CWD
+        Set<String> trackedFiles = headCommitAtBranch.getFiles().keySet();
+        for(String file: trackedFiles) {
+            headCommitAtBranch.putFileInCWD(file);
+        }
+
+        // Change HEAD pointer to checked out branch
+        Utils.writeContents(Repository.HEAD,branch);
+
+        // Delete previously tracked files that aren't tracked in the checked out branch
+        List<String> previouslyTrackedFiles = index.getUntrackedFiles();
+        for (String file: previouslyTrackedFiles) {
+            File fileToDelete = Utils.join(CWD, file);
+            fileToDelete.delete();
+        }
+
+        // Clear staging area
+        index.clearStagingArea();
 
     }
+
+
+
+    /**
+     * TODO: Include abbreviated commit IDs
+     * */
+    public static void reset(String commitID, Stage index) {
+        // Non-existent commit [FAILURE CASE]
+        List<String> commits = Utils.plainFilenamesIn(Repository.COMMITS);
+        if (!commits.contains(commitID)) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+
+        // A CWD file is untracked and is about to be overwritten by checkout [FAILURE CASE]
+        List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
+        List<String> untrackedFiles = index.getUntrackedFiles();
+        for (String file: cwdFiles) {
+            if (untrackedFiles.contains(file)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
+        }
+
+        Commit commitAtGivenID = Commit.returnCommit(commitID);
+        // Put every tracked file in CWD
+        Set<String> trackedFiles = commitAtGivenID.getFiles().keySet();
+        for(String file: trackedFiles) {
+            commitAtGivenID.putFileInCWD(file);
+        }
+
+        // Change HEAD to given ID
+        CommitTree.updateCurrentHead(commitID);
+
+        // Delete previously tracked files that aren't tracked in the checked out branch
+        List<String> previouslyTrackedFiles = index.getUntrackedFiles();
+        for (String file: previouslyTrackedFiles) {
+            File fileToDelete = Utils.join(CWD, file);
+            fileToDelete.delete();
+        }
+
+        // Clear staging area
+        index.clearStagingArea();
+
+    }
+
+    /** Try and have this method do the bulk of checkout(branch) and reset */
+    public static void rearrangeCWD(String commitID, Stage index) {
+
+    }
+
+
 
 
 

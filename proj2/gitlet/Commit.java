@@ -118,6 +118,32 @@ public class Commit implements Serializable {
         }
     }
 
+    public void putFileInCWD(String filename) {
+        // Commit doesn't have the requested file [FAILURE CASE]
+        if (!filesInCommit.containsKey(filename)) {
+            System.out.println("File does not exist in that commit.");
+            return;
+        }
+
+        // Retrieve blob of file
+        String fileContent = Blob.returnBlob(filesInCommit.get(filename));
+        List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
+
+        // A version of the file exists in CWD -> delete it
+        if (cwdFiles.contains(filename)) {
+            Utils.restrictedDelete(filename);
+        }
+
+        // Create new file in CWD and write contents
+        File currentFile = Utils.join(Repository.CWD,filename);
+        try {
+            currentFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Utils.writeContents(currentFile,fileContent);
+    }
+
     public String getParent() {
         return parent;
     }

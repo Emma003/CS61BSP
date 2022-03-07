@@ -1,6 +1,8 @@
 package gitlet;
 
 import java.io.File;
+import java.util.List;
+import java.util.TreeMap;
 
 public class CommitTree {
 
@@ -12,6 +14,16 @@ public class CommitTree {
         String currentBranch = Utils.readContentsAsString(Repository.HEAD);
         File branchFile = Utils.join(Repository.BRANCHES, currentBranch);
         return Utils.readContentsAsString(branchFile);
+    }
+
+    public static String currentBranch() {
+        return Utils.readContentsAsString(Repository.HEAD);
+    }
+
+    public static void updateCurrentHead(String commitID) {
+        String currentBranch = Utils.readContentsAsString(Repository.HEAD);
+        File branchFile = Utils.join(Repository.BRANCHES, currentBranch);
+        Utils.writeContents(branchFile, commitID);
     }
 
     /** TODO: TEST THIS (ADD MERGE CASE LATER)*/
@@ -60,14 +72,25 @@ public class CommitTree {
 
     }
 
+
+
     public static void checkoutFile(String filename) {
-
+        // Deserialize current commit
+        String currentCommitID = CommitTree.currentCommit();
+        Commit currentCommit = Commit.returnCommit(currentCommitID);
+        currentCommit.putFileInCWD(filename);
     }
 
+    /** TODO: Include abbreviated commit IDs */
     public static void checkoutCommitFile(String commitID, String filename) {
-
+        List<String> commits = Utils.plainFilenamesIn(Repository.COMMITS);
+        if (commits.contains(commitID)) {
+            Commit checkoutCommit = Commit.returnCommit(commitID);
+            checkoutCommit.putFileInCWD(filename);
+        } else {
+            System.out.println("No commit with that id exists.");
+        }
     }
-
 
 
     public void findSplit() {
