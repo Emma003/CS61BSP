@@ -22,8 +22,19 @@ public class Main {
             case "add":
                 Repository.add(args[1]);
                 break;
+            case "commit":
+                if (args.length == 2) {
+                    Repository.commit(args[1]);
+                } else {
+                    System.out.println("Please enter a commit message.");
+                }
+                break;
             case "rm":
-                Repository.rm(args[1]);
+                if (args.length == 2) {
+                    Repository.rm(args[1]);
+                } else {
+                    System.out.println("Please write a file to remove");
+                }
                 break;
             case "log":
                 Repository.log();
@@ -37,6 +48,22 @@ public class Main {
             case "status":
                 Repository.status();
                 break;
+            case "checkout":
+                if (args.length == 1) {
+                    Repository.checkoutBranch(args[1]);
+                } else if (args.length == 2) {
+                    CommitTree.checkoutFile(args[2]);
+                } else if (args.length == 4) {
+                    CommitTree.checkoutCommitFile(args[1],args[3]);
+                } else {
+                    System.out.println("Please enter the right amount of arguments.");
+                }
+            case "branch":
+                if (args.length == 2) {
+                    Repository.newBranch(args[1]);
+                } else {
+                    System.out.println("Please enter branch name");
+                }
 
         }
     }

@@ -5,9 +5,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date; // TODO: You'll likely use this in this class
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import static gitlet.Utils.join;
 
@@ -45,19 +43,25 @@ public class Commit implements Serializable {
         this.parent = null;
         this.timestamp = new Date(0); // epoch date TODO: verify this w/ print statement
         this.isMergeCommit = false;
+        this.filesInCommit = new TreeMap<>();
         String idtext = "commit" + parent + message;
         this.id = Utils.sha1(idtext);
     }
 
 
     /** Makes a new commit object (takes arguments) */
-    public Commit(String message, String parent) {
+    public Commit(String message, String parent, boolean mergeCommit) {
+        // Clone HEAD commit
+        Commit currentCommit = Commit.returnCommit(parent);
+        this.filesInCommit = currentCommit.filesInCommit;
+
+        // Update metadata
         this.message = message;
         this.parent = parent;
-        if (this.parent == null) {
-            this.timestamp = null;
-        }
-
+        this.timestamp = new Date(0);
+        this.isMergeCommit = mergeCommit;
+        String idtext = "commit" + parent + message + mergeCommit;
+        this.id = Utils.sha1(idtext);
     }
 
     public void saveCommit() {
@@ -83,18 +87,35 @@ public class Commit implements Serializable {
      */
     public boolean isCommitVersion(String filename, String blob) {
         if (filesInCommit != null) {
-            if (filesInCommit.keySet().contains(filename)) {
-                if(filesInCommit.get(filename) == blob) {
+            if (filesInCommit.containsKey(filename)) {
+                if(filesInCommit.get(filename).equals(blob)) {
                     return true;
                 }
             }
         }
-
         return false;
     }
 
-    public void addFilesToCommit(HashMap<String,String> files) {
+    /** Iterates over addition stage files and adds/modifies/deletes from the current commit*/
+    public void updateCommitFiles (Map<String,String> stagedForAddition, ArrayList<String> stagedForRemoval) {
+        // Iterating over addition stage
+        for (Map.Entry<String, String> entry : stagedForAddition.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
 
+            if(filesInCommit.containsKey(key)) {
+                filesInCommit.replace(key,value);
+            } else {
+                filesInCommit.put(key,value);
+            }
+        }
+
+        // Iterating over removal stage
+        for (String file: stagedForRemoval) {
+            if(filesInCommit.containsKey(file)) {
+                filesInCommit.remove(file);
+            }
+        }
     }
 
     public String getParent() {
@@ -119,6 +140,9 @@ public class Commit implements Serializable {
 
     @Override
     public String toString() {
+        if (isMergeCommit) {
+            return "WRITE THE CORRECT STATUS OUTPUT FOR MERGE COMMITS";
+        }
         return "=== \ncommit " + this.id + "\nDate: " + this.timestamp.toString() + "\n" + this.message + "\n";
     }
 }

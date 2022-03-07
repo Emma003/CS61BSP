@@ -85,6 +85,12 @@ public class Repository {
         Stage.saveIndex(index);
     }
 
+    public static void commit(String message) {
+        Stage index = Stage.returnIndex();
+        CommitTree.commit(index, message);
+        Stage.saveIndex(index);
+    }
+
     public static void rm(String filename) {
         Stage index = Stage.returnIndex();
         index.rm(filename);
@@ -128,30 +134,39 @@ public class Repository {
             }
         }
 
-        if (found == false) {
+        if (!found) {
             System.out.println("Found no commit with that message.");
         }
     }
 
+    public static void newBranch(String branchName) {
+        // Branch with name already exists [FAILURE CASE]
+        List<String> branches = Utils.plainFilenamesIn(BRANCHES);
+        if (branches.contains(branchName)) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
 
+        //new BRANCH file
+        File BRANCH = Utils.join(BRANCHES, branchName);
+        try {
+            BRANCH.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        // Write in pointer to current commit
+        String currentCommitID = CommitTree.currentCommit();
+        Utils.writeContents(BRANCH, currentCommitID);
 
-
-
-
-    /**
-     * TODO:Read HEAD commit object and staging area
-     *
-     * TODO:Clone HEAD commit
-     * TODO:Modify its message and timestamp
-     * TODO:Use the staging area to modify the files tracked by the new commit
-     * TODO:Untrack files that have been staged for removal by the rm command
-     *
-     * TODO:Write back any new or modified object made into a new file
-     * TODO:Clear staging area
-     * TODO:Move HEAD pointer to point to current commit
-     * TODO: FAIL: no staged files, no commit message
-     */
-    public void commit() {
+        // Update HEAD commit
+        Utils.writeContents(HEAD,branchName);
     }
+
+    public static void checkoutBranch(String branch) {
+
+    }
+
+
+
 }
