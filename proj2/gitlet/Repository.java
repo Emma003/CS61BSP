@@ -31,7 +31,7 @@ public class Repository {
     /** HEAD file */
     public static final File HEAD = join(GITLET_DIR, "HEAD.txt");
     /** master file */
-    public static final File MASTER = join(BRANCHES, "master.txt");
+    public static final File MASTER = join(BRANCHES, "master");
 
 
     /**
@@ -71,13 +71,8 @@ public class Repository {
         }
         Utils.writeContents(MASTER, initialCommit.hash());
 
-        //empty INDEX file
-        try {
-            Stage.INDEX.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        Stage setStage = new Stage();
+        Stage.createIndex(setStage);
     }
 
     public static void switchBranch(String newBranch) {
@@ -93,6 +88,12 @@ public class Repository {
     public static void rm(String filename) {
         Stage index = Stage.returnIndex();
         index.rm(filename);
+        Stage.saveIndex(index);
+    }
+
+    public static void status() {
+        Stage index = Stage.returnIndex();
+        index.printStatus();
         Stage.saveIndex(index);
     }
 
@@ -132,11 +133,7 @@ public class Repository {
         }
     }
 
-    public static void status() {
-        Stage index = Stage.returnIndex();
-        index.printStatus();
-        Stage.saveIndex(index);
-    }
+
 
 
 

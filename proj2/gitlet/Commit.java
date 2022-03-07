@@ -35,7 +35,7 @@ public class Commit implements Serializable {
     /** Is the commit a merge commit. */
     private boolean isMergeCommit;
     /** The files tracked in this Commit. */
-    private TreeMap<String,String> filesInCommit;
+    private TreeMap<String,String> filesInCommit = new TreeMap<>();
 
     /* TODO: fill in the rest of this class. */
 
@@ -82,9 +82,11 @@ public class Commit implements Serializable {
      * @return
      */
     public boolean isCommitVersion(String filename, String blob) {
-        if (filesInCommit.keySet().contains(filename)) {
-            if(filesInCommit.get(filename) == blob) {
-                return true;
+        if (filesInCommit != null) {
+            if (filesInCommit.keySet().contains(filename)) {
+                if(filesInCommit.get(filename) == blob) {
+                    return true;
+                }
             }
         }
 
@@ -117,6 +119,6 @@ public class Commit implements Serializable {
 
     @Override
     public String toString() {
-        return "=== \ncommit " + this.id + "\nDate: " + this.timestamp.toString() + "\n" + this.message;
+        return "=== \ncommit " + this.id + "\nDate: " + this.timestamp.toString() + "\n" + this.message + "\n";
     }
 }

@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,17 +14,39 @@ import static gitlet.Utils.readContentsAsString;
 public class Stage implements Serializable {
 
     /** INDEX file that contains serialized staging area object*/
-    public static final File INDEX = join(Repository.GITLET_DIR, "INDEX.txt");
+    static final File INDEX = join(Repository.GITLET_DIR, "INDEX.txt");
     /** addition staging area*/
-    public final Map<String,String> additionStage = new HashMap<>();
+    public Map<String,String> additionStage = new HashMap<>();
     /** removal staging area*/
-    public final List<String> removalStage = new ArrayList<>();
+    public ArrayList<String> removalStage = new ArrayList<>();
     /** tracked files with unstaged modifications*/
-    public final Map<String,String> modifiedTrackedFiles = new HashMap<>();
+    public Map<String,String> modifiedTrackedFiles = new HashMap<>();
     /** all files that were ever committed*/
-    public final Map<String,String> trackedFiles= new HashMap<>();
+    public Map<String,String> trackedFiles = new HashMap<>();
     /** all files in CWD that were never staged/committed*/
-    public final List<String> untrackedFiles = new ArrayList<>();
+    public ArrayList<String> untrackedFiles = new ArrayList<>();
+
+    public Stage() {
+    }
+
+    public static void createIndex(Stage stage) {
+        try {
+            Stage.INDEX.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Utils.writeObject(INDEX,stage);
+    }
+
+    public static void saveIndex(Stage stage) {
+        File indexFile = INDEX;
+        Utils.writeObject(indexFile, stage);
+    }
+
+    public static Stage returnIndex() {
+        File inFile = INDEX;
+        return Utils.readObject(inFile,Stage.class);
+    }
 
 
     /**
@@ -34,7 +57,7 @@ public class Stage implements Serializable {
         List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
 
         // Failure case: file isn't in CWD
-        if (!cwdFiles.contains(filename)) {
+        if (cwdFiles == null || !cwdFiles.contains(filename)) {
             System.out.println("File does not exist.");
             return;
         }
@@ -48,21 +71,25 @@ public class Stage implements Serializable {
         String currentCommitID = CommitTree.currentCommit();
         Commit currentCommit = Commit.returnCommit(currentCommitID);
         if (currentCommit.isCommitVersion(filename, newBlob.id)) {
-            if(additionStage.containsKey(filename)) {
+            if(additionStage != null == additionStage.containsKey(filename)) {
                 additionStage.remove(filename);
             }
             return;
         }
 
         // File is already staged
-        if (additionStage.containsKey(filename)) {
-            additionStage.replace(filename, newBlob.id);
-            return;
+        if (additionStage != null) {
+            if (additionStage.containsKey(filename)) {
+                additionStage.replace(filename, newBlob.id);
+                return;
+            }
         }
 
         // File is staged for removal
-        if (removalStage.contains(filename)) {
-            removalStage.remove(filename);
+        if (removalStage != null) {
+            if (removalStage.contains(filename)) {
+                removalStage.remove(filename);
+            }
         }
 
         // Add file to addition staging area
@@ -70,22 +97,15 @@ public class Stage implements Serializable {
 
     }
 
-    public static void saveIndex(Stage stage) {
-        File indexFile = INDEX;
-        Utils.writeObject(indexFile, stage);
-    }
-
-    public static Stage returnIndex() {
-        File inFile = INDEX;
-        return Utils.readObject(inFile,Stage.class);
-    }
-
     /** TODO: TEST THIS*/
     public List<String> getUntrackedFiles() {
         String currentCommitID = CommitTree.currentCommit();
         Commit currentCommit = Commit.returnCommit(currentCommitID);
-
         List<String> filesInCWD = Utils.plainFilenamesIn(Repository.CWD);
+
+        if (currentCommit.getFiles() == null && additionStage == null) {
+            return filesInCWD;
+        }
         for (String file: filesInCWD) {
             if(!currentCommit.getFiles().containsKey(file) && !additionStage.containsKey(file)) {
                 untrackedFiles.add(file);
@@ -98,15 +118,22 @@ public class Stage implements Serializable {
 
     /** TODO: TEST THIS */
     public void rm(String filename) {
-        // Check if file is tracked/stage
+        // Deserialize current commit
         String currentCommitID = CommitTree.currentCommit();
         Commit currentCommit = Commit.returnCommit(currentCommitID);
-        if(!currentCommit.getFiles().containsKey(filename) && !additionStage.containsKey(filename)) {
-            System.out.println("No reason to remove the file");
+
+        // If the current isn't tracking any file
+        if (currentCommit.getFiles() == null) {
+            System.out.println("No reason to remove the file.");
+            return;
+
+        // If the file isn't tracked or stage
+        } else if (!currentCommit.getFiles().containsKey(filename) && !additionStage.containsKey(filename)) {
+            System.out.println("No reason to remove the file.");
             return;
         }
 
-        // File is already staged -> remove from staginf
+        // File is already staged -> remove from staging
         if (additionStage.containsKey(filename)) {
             additionStage.remove(filename);
         }
@@ -133,24 +160,33 @@ public class Stage implements Serializable {
             System.out.println(branch);
         }
 
-        // Addition stage area
+        // Addition stage
         System.out.println("\n\n=== Staged Files ===");
-        for (String file: additionStage.keySet()) {
-            System.out.println(file);
+        if(additionStage != null) {
+            for (String file: additionStage.keySet()) {
+                System.out.println(file);
+            }
         }
 
+        // Removal stage
         System.out.println("\n\n=== Removed Files ===");
-        for (String file: removalStage) {
-            System.out.println(file);
+        if (removalStage != null) {
+            for (String file : removalStage) {
+                System.out.println(file);
+            }
         }
 
         System.out.println("\n\n=== Modifications Not Staged For Commit ===");
 
+        // Untracked files
         System.out.println("\n\n=== Untracked Files ===");
         List<String> untrackedFiles = this.getUntrackedFiles();
-        for (String file: untrackedFiles) {
-            System.out.println(file);
+        if(untrackedFiles != null) {
+            for (String file: untrackedFiles) {
+                System.out.println(file);
+            }
         }
+
     }
 
     public static void clearStagingArea(String filename) {
