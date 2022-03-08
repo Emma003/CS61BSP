@@ -23,10 +23,10 @@ public class Main {
                 Repository.add(args[1]);
                 break;
             case "commit":
-                if (args.length == 2) {
-                    Repository.commit(args[1]);
-                } else {
+                if (args.length != 2 || args[1].equals("")) {
                     System.out.println("Please enter a commit message.");
+                } else if (args.length == 2) {
+                    Repository.commit(args[1]);
                 }
                 break;
             case "rm":

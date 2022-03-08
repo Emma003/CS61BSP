@@ -150,7 +150,7 @@ public class Stage implements Serializable {
         }
 
         // Addition stage
-        System.out.println("\n\n=== Staged Files ===");
+        System.out.println("\n=== Staged Files ===");
         if(additionStage != null) {
             for (String file: additionStage.keySet()) {
                 System.out.println(file);
@@ -158,7 +158,7 @@ public class Stage implements Serializable {
         }
 
         // Removal stage
-        System.out.println("\n\n=== Removed Files ===");
+        System.out.println("\n=== Removed Files ===");
         if (removalStage != null) {
             for (String file : removalStage) {
                 System.out.println(file);
@@ -166,10 +166,10 @@ public class Stage implements Serializable {
         }
 
         // Modified non-staged files
-        System.out.println("\n\n=== Modifications Not Staged For Commit ===");
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
 
         // Untracked files
-        System.out.println("\n\n=== Untracked Files ===");
+        System.out.println("\n=== Untracked Files ===");
         List<String> untracked = this.getUntrackedFiles();
         if(untracked != null) {
             for (String file: untracked) {
