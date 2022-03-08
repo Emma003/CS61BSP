@@ -36,7 +36,6 @@ public class Repository {
 
 
     /**
-     * TODO: TEST THIS
      *
      * Directory map:
      * .gitlet
@@ -46,7 +45,6 @@ public class Repository {
         // Failure case
         if (GITLET_DIR.exists()) {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
-            return;
         }
 
         // Making initial directories and files

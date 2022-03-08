@@ -59,7 +59,19 @@ public class Stage implements Serializable {
      * @param filename
      */
     public void add(String filename) {
+
         List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
+        String currentCommitID = CommitTree.currentCommit();
+        Commit currentCommit = Commit.returnCommit(currentCommitID);
+
+        // File is staged for removal -> restore file in CWD and add to current commit
+        if (removalStage.contains(filename)) {
+            removalStage.remove(filename);
+            currentCommit.putFileInCWD(filename);
+            Blob newBlob = Blob.returnBlob(filename);
+            currentCommit.filesInCommit.put(filename,newBlob.id);
+            return;
+        }
 
         // File isn't in CWD [FAILURE CASE]
         if (cwdFiles == null || !cwdFiles.contains(filename)) {
@@ -67,14 +79,8 @@ public class Stage implements Serializable {
             return;
         }
 
-        // Return file and blob using filename
-        File addedFile = Utils.join(Repository.CWD, filename);
-        String contents = Utils.readContentsAsString(addedFile);
-        Blob newBlob = new Blob(filename, contents);
-
+        Blob newBlob = Blob.returnBlob(filename);
         // File version is already in current commit [FAILURE CASE]
-        String currentCommitID = CommitTree.currentCommit();
-        Commit currentCommit = Commit.returnCommit(currentCommitID);
         if (currentCommit.isCommitVersion(filename, newBlob.id)) {
             if(additionStage != null == additionStage.containsKey(filename)) {
                 additionStage.remove(filename);
@@ -87,13 +93,6 @@ public class Stage implements Serializable {
             if (additionStage.containsKey(filename)) {
                 additionStage.replace(filename, newBlob.id);
                 return;
-            }
-        }
-
-        // File is staged for removal
-        if (removalStage != null) {
-            if (removalStage.contains(filename)) {
-                removalStage.remove(filename);
             }
         }
 
@@ -121,14 +120,20 @@ public class Stage implements Serializable {
             return;
         }
 
-        // File is already staged -> remove from staging
-        if (additionStage.containsKey(filename)) {
-            additionStage.remove(filename);
-        }
-
         // File is tracked -> delete from CWD
+        boolean isTracked = false;
         if (currentCommit.getFiles().containsKey(filename)) {
             Utils.restrictedDelete(filename);
+            isTracked = true;
+        }
+
+        // File is already staged -> remove from add. stage and add to rm stage
+        // File is staged but untracked -> just remove from add. stage
+        if (additionStage.containsKey(filename)) {
+            additionStage.remove(filename);
+            if (!isTracked) {
+                return;
+            }
         }
 
         removalStage.add(filename);

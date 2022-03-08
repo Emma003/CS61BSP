@@ -26,8 +26,8 @@ public class Commit implements Serializable {
     private String id;
     /** Is the commit a merge commit. */
     private boolean isMergeCommit;
-    /** The files tracked in this Commit. */
-    private TreeMap<String,String> filesInCommit = new TreeMap<>();
+    /** The files tracked in this Commit. In the form <filename,blobID> */
+    public TreeMap<String,String> filesInCommit = new TreeMap<>();
 
     /* TODO: fill in the rest of this class. */
 
@@ -120,7 +120,7 @@ public class Commit implements Serializable {
         }
 
         // Retrieve blob of file
-        String fileContent = Blob.returnBlob(filesInCommit.get(filename));
+        String fileContent = Blob.returnBlobContent(filesInCommit.get(filename));
         List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
 
         // A version of the file exists in CWD -> delete it

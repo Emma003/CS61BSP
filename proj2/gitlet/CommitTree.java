@@ -83,6 +83,7 @@ public class CommitTree {
 
     /** TODO: Include abbreviated commit IDs */
     public static void checkoutCommitFile(String commitID, String filename) {
+        // Commit exists
         List<String> commits = Utils.plainFilenamesIn(Repository.COMMITS);
         if (commits.contains(commitID)) {
             Commit checkoutCommit = Commit.returnCommit(commitID);

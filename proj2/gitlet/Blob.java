@@ -28,10 +28,16 @@ public class Blob implements Serializable {
         Utils.writeObject(blobFile,contents);
     }
 
+    public static Blob returnBlob(String filename) {
+        File addedFile = Utils.join(Repository.CWD, filename);
+        String contents = Utils.readContentsAsString(addedFile);
+        return new Blob(filename, contents);
+    }
+
     /**
      * Returns blob content at a string given blob id
      * */
-    public static String returnBlob(String BlobID) {
+    public static String returnBlobContent(String BlobID) {
         File inFile = join(Repository.BLOBS, BlobID);
         String blobContents = Utils.readObject(inFile,String.class);
         return blobContents;
