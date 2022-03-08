@@ -228,6 +228,7 @@ public class Repository {
 
         // Clear staging area
         index.clearStagingArea();
+        index.untrackedFiles.clear();
 
     }
 
@@ -273,6 +274,7 @@ public class Repository {
 
         // Clear staging area
         index.clearStagingArea();
+        index.untrackedFiles.clear();
 
     }
 
