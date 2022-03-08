@@ -5,27 +5,21 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static gitlet.Utils.join;
-
 /** Represents a gitlet commit object.
- *
- *
  *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
  *  @author procrastin
  */
 public class Commit implements Serializable {
-    /**
-     * TODO: add instance variables here.
-     * TODO: MAKE SURE TO READ THE TREEMAP DOCUMENTATION, THERE'S A BUNCH OF USEFUL METHOD IT IMPLEMENTS!!!!
 
     /** The message of this Commit. */
     private String message;
     /** The date of this Commit. */
-    private Date timestamp;
+    private String timestamp;
     /** The parent of this Commit. */
     private String parent;
     /** The id of this Commit. */
@@ -41,7 +35,7 @@ public class Commit implements Serializable {
     public Commit() {
         this.message = "initial commit";
         this.parent = null;
-        this.timestamp = new Date(0); // epoch date TODO: verify this w/ print statement
+        this.timestamp = getCurrentDate();
         this.isMergeCommit = false;
         this.filesInCommit = new TreeMap<>();
         String idtext = "commit" + parent + message;
@@ -58,7 +52,7 @@ public class Commit implements Serializable {
         // Update metadata
         this.message = message;
         this.parent = parent;
-        this.timestamp = new Date(0);
+        this.timestamp = getCurrentDate();
         this.isMergeCommit = mergeCommit;
         String idtext = "commit" + parent + message + mergeCommit;
         this.id = Utils.sha1(idtext);
@@ -156,8 +150,11 @@ public class Commit implements Serializable {
         return this.message;
     }
 
-    public Date getDate() {
-        return this.timestamp;
+    public static String getCurrentDate() {
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.ENGLISH);
+        String strDate = formatter.format(date);
+        return strDate;
     }
 
     public String hash() {
@@ -169,6 +166,6 @@ public class Commit implements Serializable {
         if (isMergeCommit) {
             return "WRITE THE CORRECT STATUS OUTPUT FOR MERGE COMMITS";
         }
-        return "=== \ncommit " + this.id + "\nDate: " + this.timestamp.toString() + "\n" + this.message + "\n";
+        return "=== \ncommit " + this.id + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
     }
 }
