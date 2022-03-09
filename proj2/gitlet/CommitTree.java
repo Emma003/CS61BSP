@@ -83,6 +83,10 @@ public class CommitTree {
 
     /** TODO: Include abbreviated commit IDs */
     public static void checkoutCommitFile(String commitID, String filename) {
+        // ID is shorter than 40 chars -> get full version
+        if (commitID.length() < 40) {
+            commitID = Commit.getFullID(commitID);
+        }
         // Commit exists
         List<String> commits = Utils.plainFilenamesIn(Repository.COMMITS);
         if (commits.contains(commitID)) {

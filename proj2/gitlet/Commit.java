@@ -161,6 +161,17 @@ public class Commit implements Serializable {
         return this.id;
     }
 
+    /** This method returns the full ID given a shortened version */
+    public static String getFullID(String abbreviation) {
+        List<String> allCommits = Utils.plainFilenamesIn(Repository.COMMITS);
+        for (String commit : allCommits) {
+            if (commit.contains(abbreviation)) {
+                return commit;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         if (isMergeCommit) {
