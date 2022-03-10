@@ -58,13 +58,12 @@ public class CommitTree {
         String currentCommitID = CommitTree.currentCommit();
         if (isMergeCommit) {
             String otherBranchHeadID = CommitTree.otherCommit(otherBranch);
-            newCommit = new Commit(message, currentCommitID, otherBranchHeadID, index.additionStage, isMergeCommit);
+            newCommit = new Commit(message, currentCommitID, otherBranchHeadID, isMergeCommit);
         } else {
             newCommit = new Commit(message, currentCommitID, isMergeCommit);
-            newCommit.updateCommitFiles(index.additionStage, index.removalStage); // Updating tracked files for new commit
-
         }
 
+        newCommit.updateCommitFiles(index.additionStage, index.removalStage); // Updating tracked files for new commit
         newCommit.saveCommit();
 
         // Clear staging area
@@ -247,13 +246,6 @@ public class CommitTree {
                 }
             }
 
-            if (!mergeCaseHappened) {
-                if(!(index.additionStage.containsKey(key))) {
-                    index.additionStage.put(key,value);
-                }
-            }
-
-
         }
 
         // Iterating over other branch files
@@ -284,11 +276,6 @@ public class CommitTree {
                 }
             }
 
-            if (!mergeCaseHappened) {
-                if(!(index.additionStage.containsKey(key))) {
-                    index.additionStage.put(key,value);
-                }
-            }
         }
 
         if (conflictHappened) {

@@ -63,11 +63,15 @@ public class Commit implements Serializable {
     /** Makes a new merge commit object
      * TODO: finish writing this
      * */
-    public Commit(String message, String parent1, String parent2, TreeMap<String, String> mergedFiles, boolean isMergeCommit) {
+    public Commit(String message, String parent1, String parent2, boolean isMergeCommit) {
+        // Clone HEAD commit
+        Commit currentCommit = Commit.returnCommit(parent);
+        this.filesInCommit = currentCommit.filesInCommit;
+
+        // Update metadata
         this.message = message;
         this.parent = parent1;
         this.timestamp = getCurrentDate();
-        this.filesInCommit = mergedFiles;
         this.isMergeCommit = isMergeCommit;
         this.secondParent = parent2;
         String idtext = "commit" + parent1 + message + isMergeCommit;
