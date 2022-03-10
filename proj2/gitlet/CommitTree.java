@@ -113,7 +113,12 @@ public class CommitTree {
             return;
         }
 
+        // Branch doesn't exist [FAILURE CASE]
         List<String> branches = Utils.plainFilenamesIn(Repository.BRANCHES);
+        if (!(branches.contains(branch))) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
 
         Commit splitPoint = Commit.returnCommit(findSplit());
         Map <String,String> splitPointFiles = splitPoint.getFiles();
@@ -125,14 +130,9 @@ public class CommitTree {
         Map <String,String> otherFiles = otherHeadCommit.getFiles();
         /** Stores filename with its merge case number */
         Map<String, String> mergeCases = new HashMap<>();
-
         boolean conflictHappened = false;
 
-        // Branch doesn't exist [FAILURE CASE]
-        if (!(branches.contains(branch))) {
-            System.out.println("A branch with that name does not exist.");
-            return;
-        }
+
 
         // Given branch is current branch [FAILURE CASE]
         if (branch.equals(currentBranch())) {
@@ -320,20 +320,26 @@ public class CommitTree {
         // Initialize the two different file contents that will be written into the new merge file
         String currentBlobContent = "";
         String otherBlobContent = "";
+        String newFileContents = "";
 
         switch(conflictCase) {
             case 1,2,3:
                 currentBlobContent = Blob.returnBlobContent(currentFiles.get(filename));
                 otherBlobContent = Blob.returnBlobContent(otherFiles.get(filename));
+                newFileContents = "<<<<<<< HEAD\n" + currentBlobContent + "\n=======\n" + otherBlobContent + ">>>>>>>" ;
+                break;
             case 4:
                 currentBlobContent = Blob.returnBlobContent(currentFiles.get(filename));
                 otherBlobContent = "";
+                newFileContents = "<<<<<<< HEAD\n" + currentBlobContent + "\n=======\n>>>>>>>" ;
+                break;
             case 5:
                 currentBlobContent = "";
                 otherBlobContent = Blob.returnBlobContent(otherFiles.get(filename));
+                newFileContents = "<<<<<<< HEAD\n=======\n" + otherBlobContent + "\n>>>>>>>" ;
+                break;
         }
 
-        String newFileContents = "<<<<<<< HEAD\n" + currentBlobContent + "\n=======\n" + otherBlobContent + "\n>>>>>>>" ;
         Utils.writeContents(CONFLICT_FILE, newFileContents);
         index.add(filename);
     }
