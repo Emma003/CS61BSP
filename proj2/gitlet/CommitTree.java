@@ -12,8 +12,7 @@ public class CommitTree {
      * @return string id of current HEAD commit
      */
     public static String currentCommit() {
-        String currentBranch = Utils.readContentsAsString(Repository.HEAD);
-        File branchFile = Utils.join(Repository.BRANCHES, currentBranch);
+        File branchFile = Utils.join(Repository.BRANCHES, currentBranch());
         return Utils.readContentsAsString(branchFile);
     }
 
@@ -216,10 +215,12 @@ public class CommitTree {
                         if (!(otherFiles.containsValue(value))) {
                             noConflictmergeCase(branch, index, key, 1);
                             mergeCaseHappened = true;
+                            //System.out.println("merge case 1");
                         }
                     } else {
                         noConflictmergeCase(branch, index, key, 6);
                         mergeCaseHappened = true;
+                        //System.out.println("merge case 6");
                     }
                 } else {
                     if (otherFiles.containsKey(key)) {
@@ -227,11 +228,13 @@ public class CommitTree {
                             createConflictFile(index, branch, key, 3); // CONFLICT case III
                             mergeCaseHappened = true;
                             conflictHappened = true;
+                            //System.out.println("merge case 8 [CONFLICT 3]");
                         }
                     } else {
                         createConflictFile(index, branch, key, 4); // CONFLICT case IV
                         mergeCaseHappened = true;
                         conflictHappened = true;
+                        //System.out.println("merge case 8 [CONFLICT 4]");
                     }
                 }
             } else {
@@ -240,6 +243,7 @@ public class CommitTree {
                         createConflictFile(index, branch, key, 1); // CONFLICT case I and II
                         mergeCaseHappened = true;
                         conflictHappened = true;
+                        //System.out.println("merge case 8 [CONFLICT 1]");
                     }
                 }
             }
@@ -265,12 +269,14 @@ public class CommitTree {
                         createConflictFile(index, branch, key,5); // CONFLICT case 5
                         mergeCaseHappened = true;
                         conflictHappened = true;
+                        //System.out.println("merge case 8 [CONFLICT 5]");
                     }
                 }
             } else {
                 if (!currentFiles.containsKey(key)) {
                     noConflictmergeCase(branch, index, key,5);
                     mergeCaseHappened = true;
+                    //System.out.println("merge case 5");
                 }
             }
 
@@ -288,14 +294,16 @@ public class CommitTree {
             case 1,5:
                 checkoutCommitFile(otherCommit(other), filename);
                 index.add(filename);
+                return;
             case 6:
                 index.rm(filename);
+                return;
         }
     }
 
     public static void createConflictFile(Stage index, String other, String filename, int conflictCase) {
         // Create new conflict file
-        File CONFLICT_FILE = Utils.join(Repository.CWD, "filename");
+        File CONFLICT_FILE = Utils.join(Repository.CWD, filename);
         try {
             CONFLICT_FILE.createNewFile();
         } catch (IOException e) {
@@ -325,7 +333,7 @@ public class CommitTree {
                 otherBlobContent = Blob.returnBlobContent(otherFiles.get(filename));
         }
 
-        String newFileContents = "<<<<<<< HEAD\ncontents of file in current branch\n" + currentBlobContent + "\n=======\n" + otherBlobContent + "\n>>>>>>>" ;
+        String newFileContents = "<<<<<<< HEAD\n" + currentBlobContent + "\n=======\n" + otherBlobContent + "\n>>>>>>>" ;
         Utils.writeContents(CONFLICT_FILE, newFileContents);
         index.add(filename);
     }
@@ -344,7 +352,7 @@ public class CommitTree {
          * TODO: watch graph traversal videos / look up LCA algorithms in java
          */
 
-        File SPLIT = Utils.join(Repository.CWD, "SPLIT");
+        File SPLIT = Utils.join(Repository.GITLET_DIR, "SPLIT");
         return Utils.readContentsAsString(SPLIT);
     }
 

@@ -65,7 +65,7 @@ public class Commit implements Serializable {
      * */
     public Commit(String message, String parent1, String parent2, boolean isMergeCommit) {
         // Clone HEAD commit
-        Commit currentCommit = Commit.returnCommit(parent);
+        Commit currentCommit = Commit.returnCommit(parent1);
         this.filesInCommit = currentCommit.filesInCommit;
 
         // Update metadata
@@ -196,7 +196,7 @@ public class Commit implements Serializable {
     @Override
     public String toString() {
         if (isMergeCommit) {
-            return "=== \ncommit " + this.id + "Merge: " + this.parent.substring(0,8) + " " + this.secondParent.substring(0,8) + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
+            return "=== \ncommit " + this.id + "\nMerge: " + this.parent.substring(0,7) + " " + this.secondParent.substring(0,7) + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
         }
         return "=== \ncommit " + this.id + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
     }
