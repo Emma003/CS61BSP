@@ -163,7 +163,7 @@ public class Repository {
         }
 
         //new SPLIT file
-        File SPLIT = Utils.join(CWD, "SPLIT");
+        File SPLIT = Utils.join(GITLET_DIR, "SPLIT");
         if (!SPLIT.exists()) {
             try {
                 BRANCH.createNewFile();

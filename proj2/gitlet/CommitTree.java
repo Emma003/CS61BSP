@@ -8,8 +8,6 @@ import java.util.TreeMap;
 
 public class CommitTree {
 
-    public static TreeMap<String, String> mergeFiles = new TreeMap<>();
-
     /**
      * @return string id of current HEAD commit
      */
