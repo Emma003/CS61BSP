@@ -286,7 +286,7 @@ public class CommitTree {
             System.out.println("Encountered a merge conflict.");
         }
 
-        commit(index, "Merged " + currentBranch() + " into " + branch + ".", true, branch);
+        commit(index, "Merged " + branch + " into " + currentBranch() + ".", true, branch);
     }
 
     public static void noConflictmergeCase (String other, Stage index, String filename, int mergeCase) {
