@@ -78,6 +78,13 @@ public class Repository {
         Utils.writeContents(HEAD, newBranch);
     }
 
+    public static void merge(String branch) {
+        Stage index = Stage.returnIndex();
+        CommitTree.merge(branch,index);
+        Stage.saveIndex(index);
+    }
+
+
     public static void add(String filename) {
         Stage index = Stage.returnIndex();
         index.add(filename);
@@ -86,7 +93,7 @@ public class Repository {
 
     public static void commit(String message) {
         Stage index = Stage.returnIndex();
-        CommitTree.commit(index, message);
+        CommitTree.commit(index, message, false, null);
         Stage.saveIndex(index);
     }
 
@@ -138,6 +145,7 @@ public class Repository {
         }
     }
 
+    /** Create split point file */
     public static void newBranch(String branchName) {
         // Branch with name already exists [FAILURE CASE]
         List<String> branches = Utils.plainFilenamesIn(BRANCHES);
@@ -154,9 +162,20 @@ public class Repository {
             e.printStackTrace();
         }
 
+        //new SPLIT file
+        File SPLIT = Utils.join(CWD, "SPLIT");
+        if (!SPLIT.exists()) {
+            try {
+                BRANCH.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Write in pointer to current commit
         String currentCommitID = CommitTree.currentCommit();
         Utils.writeContents(BRANCH, currentCommitID);
+        Utils.writeContents(SPLIT, currentCommitID);
     }
 
     public static void rmBranch(String branchName) {

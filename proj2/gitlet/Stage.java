@@ -3,10 +3,7 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gitlet.Utils.join;
 import static gitlet.Utils.readContentsAsString;
@@ -16,7 +13,7 @@ public class Stage implements Serializable {
     /** INDEX file that contains serialized staging area object*/
     static final File INDEX = join(Repository.GITLET_DIR, "INDEX.txt");
     /** addition staging area*/
-    public Map<String,String> additionStage = new HashMap<>();
+    public TreeMap<String,String> additionStage = new TreeMap<>();
     /** removal staging area*/
     public ArrayList<String> removalStage = new ArrayList<>();
     /** tracked files with unstaged modifications*/
@@ -172,11 +169,48 @@ public class Stage implements Serializable {
 
         // Modified non-staged files
         System.out.println("\n=== Modifications Not Staged For Commit ===");
+        List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
+        Commit currentCommit = Commit.returnCommit(CommitTree.currentCommit());
+        TreeMap<String,String> trackedFiles = currentCommit.getFiles();
+
+        // Iterating over tracked files
+        for (Map.Entry<String, String> entry : trackedFiles.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (cwdFiles.contains(key)) {
+                Blob cwdFileBlob = Blob.returnBlob(key);
+                if (!(cwdFileBlob.id.equals(value)) && !(additionStage.containsKey(key))) {
+                    System.out.println(key + " (modified)");
+                }
+            } else {
+                if (!(removalStage.contains(key))) {
+                    System.out.println(key + " (deleted)");
+                }
+            }
+        }
+
+        // Iterating over addition stage
+        for (Map.Entry<String, String> entry : additionStage.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (cwdFiles.contains(key)) {
+                Blob cwdFileBlob = Blob.returnBlob(key);
+                if (!(cwdFileBlob.id.equals(value)) && !(additionStage.containsKey(key))) {
+                    System.out.println(key + " (modified)");
+                }
+            } else {
+                System.out.println(key + " (deleted)");
+
+            }
+        }
+
 
         // Untracked files
         System.out.println("\n=== Untracked Files ===");
         List<String> untracked = this.getUntrackedFiles();
-        if(untracked != null) {
+        if (untracked != null) {
             for (String file: untracked) {
                 System.out.println(file);
             }
@@ -186,7 +220,7 @@ public class Stage implements Serializable {
 
     }
 
-    /** TODO: TEST THIS
+    /**
      * This method returns the list of files in CWD that haven't been staged or committed
      * [HELPER METHOD]
      * */

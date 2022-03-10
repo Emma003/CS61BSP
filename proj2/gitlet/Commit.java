@@ -22,6 +22,8 @@ public class Commit implements Serializable {
     private String timestamp;
     /** The parent of this Commit. */
     private String parent;
+    /** The 2nd parent of this merge Commit. */
+    private String secondParent;
     /** The id of this Commit. */
     private String id;
     /** Is the commit a merge commit. */
@@ -43,8 +45,8 @@ public class Commit implements Serializable {
     }
 
 
-    /** Makes a new commit object (takes arguments) */
-    public Commit(String message, String parent, boolean mergeCommit) {
+    /** Makes a new commit object */
+    public Commit(String message, String parent, boolean isMergeCommit) {
         // Clone HEAD commit
         Commit currentCommit = Commit.returnCommit(parent);
         this.filesInCommit = currentCommit.filesInCommit;
@@ -53,9 +55,24 @@ public class Commit implements Serializable {
         this.message = message;
         this.parent = parent;
         this.timestamp = getCurrentDate();
-        this.isMergeCommit = mergeCommit;
-        String idtext = "commit" + parent + message + mergeCommit;
+        this.isMergeCommit = isMergeCommit;
+        String idtext = "commit" + parent + message + isMergeCommit;
         this.id = Utils.sha1(idtext);
+    }
+
+    /** Makes a new merge commit object
+     * TODO: finish writing this
+     * */
+    public Commit(String message, String parent1, String parent2, TreeMap<String, String> mergedFiles, boolean isMergeCommit) {
+        this.message = message;
+        this.parent = parent1;
+        this.timestamp = getCurrentDate();
+        this.filesInCommit = mergedFiles;
+        this.isMergeCommit = isMergeCommit;
+        this.secondParent = parent2;
+        String idtext = "commit" + parent1 + message + isMergeCommit;
+        this.id = Utils.sha1(idtext);
+
     }
 
     public void saveCommit() {
@@ -175,7 +192,7 @@ public class Commit implements Serializable {
     @Override
     public String toString() {
         if (isMergeCommit) {
-            return "WRITE THE CORRECT STATUS OUTPUT FOR MERGE COMMITS";
+            return "=== \ncommit " + this.id + "Merge: " + this.parent.substring(0,8) + " " + this.secondParent.substring(0,8) + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
         }
         return "=== \ncommit " + this.id + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
     }

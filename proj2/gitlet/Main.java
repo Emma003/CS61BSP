@@ -96,6 +96,10 @@ public class Main {
                 Repository.reset(args[1], index);
                 Stage.saveIndex(index);
                 break;
+            case "merge":
+                validateNumArgs(args, 2);
+                Repository.merge(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
         }
