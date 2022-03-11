@@ -93,8 +93,6 @@ public class CommitTree {
         }
     }
 
-
-
     public static void merge (String branch, Stage index) {
         // Uncommitted additions/removals [FAILURE CASE]
         if (!(index.additionStage.isEmpty()) || !(index.removalStage.isEmpty())) {
@@ -138,13 +136,13 @@ public class CommitTree {
 
 
         // Split point is the same commit as given branch [FAILURE CASE]
-        if (splitPoint.equals(otherHeadCommit)) {
+        if (splitPoint.hash().equals(otherHeadCommit.hash())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
 
         // Split point is the same commit as current branch [FAILURE CASE]
-        if (splitPoint.equals(currentHeadCommit)) {
+        if (splitPoint.hash().equals(currentHeadCommit.hash())) {
             Repository.checkoutBranch(branch, index);
             System.out.println("Current branch fast-forwarded.");
             return;
