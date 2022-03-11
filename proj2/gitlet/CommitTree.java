@@ -1,13 +1,9 @@
 package gitlet;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class CommitTree {
-
     /**
      * @return string id of current HEAD commit
      */
@@ -100,13 +96,6 @@ public class CommitTree {
 
 
     public static void merge (String branch, Stage index) {
-
-        // Untracked file in the current commit [FAILURE CASE]
-        if (!(index.getUntrackedFiles().isEmpty())) {
-            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-            return;
-        }
-
         // Uncommitted additions/removals [FAILURE CASE]
         if (!(index.additionStage.isEmpty()) || !(index.removalStage.isEmpty())) {
             System.out.println("You have uncommitted changes.");
@@ -120,25 +109,33 @@ public class CommitTree {
             return;
         }
 
-        Commit splitPoint = Commit.returnCommit(findSplit());
-        Map <String,String> splitPointFiles = splitPoint.getFiles();
-
-        Commit currentHeadCommit = Commit.returnCommit(currentCommit());
-        Map <String,String> currentFiles = currentHeadCommit.getFiles();
-
-        Commit otherHeadCommit = Commit.returnCommit(otherCommit(branch));
-        Map <String,String> otherFiles = otherHeadCommit.getFiles();
-        /** Stores filename with its merge case number */
-        Map<String, String> mergeCases = new HashMap<>();
-        boolean conflictHappened = false;
-
-
-
         // Given branch is current branch [FAILURE CASE]
         if (branch.equals(currentBranch())) {
             System.out.println("Cannot merge a branch with itself.");
             return;
         }
+
+        // Getting the files for the split, current branch, and given branch head commits
+        Commit currentHeadCommit = Commit.returnCommit(currentCommit());
+        Map <String,String> currentFiles = currentHeadCommit.getFiles();
+
+        Commit otherHeadCommit = Commit.returnCommit(otherCommit(branch));
+        Map <String,String> otherFiles = otherHeadCommit.getFiles();
+
+        Commit splitPoint = Commit.returnCommit(findSplit(currentHeadCommit, otherHeadCommit));
+        Map <String,String> splitPointFiles = splitPoint.getFiles();
+
+        // Untracked file in the current commit [FAILURE CASE]
+        List <String> currentUntrackedFiles = index.getUntrackedFiles();
+        for (String file: currentUntrackedFiles) {
+            // && !(otherFiles.containsKey(file))
+            if (!(currentUntrackedFiles.isEmpty())) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                index.untrackedFiles.clear();
+                return;
+            }
+        }
+
 
         // Split point is the same commit as given branch [FAILURE CASE]
         if (splitPoint.equals(otherHeadCommit)) {
@@ -185,6 +182,8 @@ public class CommitTree {
          *      -> if there was a merge conflict, print "Encountered.."
          *
          */
+
+        boolean conflictHappened = false;
 
         // Iterating over current branch files
         for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
@@ -344,22 +343,40 @@ public class CommitTree {
         index.add(filename);
     }
 
-    public static String findSplit() {
-        /**
-         * [HELPER METHOD]
-         * Returns ID of the split point.
-         *
-         * TODO: starting from the head, go down the history of commits for one branch (add it to an ordered list or something) then for the
-         * other branch, go down until you find a commit that was in the list of commits of the other branch
-         *
-         * TODO: think of a way to deal with finding a split point when there was a merge commit in the commit history (occurs when a commit node
-         * has 2 parents)
-         *
-         * TODO: watch graph traversal videos / look up LCA algorithms in java
-         */
+    /**
+     * [HELPER METHOD]
+     * Returns ID of the split point.
+     *
+     * TODO: think of a way to deal with finding a split point when there was a merge commit in the commit history (occurs when a commit node
+     * has 2 parents)
+     */
+    public static String findSplit(Commit currentBranchHead, Commit otherBranchHead) {
+        Commit currentPointer = currentBranchHead;
+        List<String> commitHistory = new ArrayList<>();
+        // Add latest commit
+        commitHistory.add(currentPointer.hash());
 
-        File SPLIT = Utils.join(Repository.GITLET_DIR, "SPLIT");
-        return Utils.readContentsAsString(SPLIT);
+        // Add the current branch's history into a commit
+        while(currentPointer.getParent() != null) {
+            commitHistory.add(currentPointer.getParent());
+            currentPointer = Commit.returnCommit(currentPointer.getParent());
+        }
+
+        // Add very first commit
+        commitHistory.add(currentPointer.hash());
+
+        Commit splitCommit = closestCommonAncestor(commitHistory, otherBranchHead);
+        return splitCommit.hash();
+    }
+
+    /**
+     * [HELPER METHOD]
+     * Recursive helper function that goes through branch's commit parent to find the latest common ancestor */
+    public static Commit closestCommonAncestor (List<String> history, Commit current) {
+        if (history.contains(current.hash())) {
+            return current;
+        }
+        return Commit.returnCommit(current.getParent());
     }
 
 
