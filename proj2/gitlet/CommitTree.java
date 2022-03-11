@@ -228,7 +228,7 @@ public class CommitTree {
                             createConflictFile(index, branch, key, 3); // CONFLICT case III
                             mergeCaseHappened = true;
                             conflictHappened = true;
-                            System.out.println("merge case 8 [CONFLICT 3]");
+                            //System.out.println("merge case 8 [CONFLICT 3]");
                         }
                     } else {
                         createConflictFile(index, branch, key, 4); // CONFLICT case IV
@@ -243,7 +243,7 @@ public class CommitTree {
                         createConflictFile(index, branch, key, 1); // CONFLICT case I and II
                         mergeCaseHappened = true;
                         conflictHappened = true;
-                        System.out.println("merge case 8 [CONFLICT 1]");
+                        //System.out.println("merge case 8 [CONFLICT 1]");
                     }
                 }
             }
