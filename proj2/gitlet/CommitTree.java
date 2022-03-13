@@ -69,7 +69,7 @@ public class CommitTree {
 
     }
 
-
+    /** Performs checkout function */
     public static void checkoutFile(String filename) {
         // Deserialize current commit
         String currentCommitID = CommitTree.currentCommit();
@@ -77,7 +77,7 @@ public class CommitTree {
         currentCommit.putFileInCWD(filename);
     }
 
-    /** TODO: Include abbreviated commit IDs */
+    /** Performs checkout function */
     public static void checkoutCommitFile(String commitID, String filename) {
         // ID is shorter than 40 chars -> get full version
         if (commitID.length() < 40) {
@@ -93,6 +93,7 @@ public class CommitTree {
         }
     }
 
+    /** Performs merge function */
     public static void merge (String branch, Stage index) {
         // Uncommitted additions/removals [FAILURE CASE]
         if (!(index.additionStage.isEmpty()) || !(index.removalStage.isEmpty())) {
@@ -150,26 +151,26 @@ public class CommitTree {
 
         /** MERGE CASES ~~~~~~ CURRENT -> master, GIVEN -> other
          *
-         *  --[1] master: same | given: modified | present @ split
+         *  [1] master: same | given: modified | present @ split
          *      -> check out + stage
          *
-         *  -[2] master: modified | given: same | present @ split
+         *  [2] master: modified | given: same | present @ split
          *      -> file stays as is
          *
-         *  -[3] master: modified in same way | given: modified in same way [same content or both deleted] | present @ split
+         *  [3] master: modified in same way | given: modified in same way [same content or both deleted] | present @ split
          *  ** READ THE SPEC FOR THIS ONE AGAIN, KINDA CONFUSING
          *      -> file stays as is
          *
-         *  -[4] master: created | given: absent | absent @ split
+         *  [4] master: created | given: absent | absent @ split
          *      -> file stays as is
          *
-         *  --[5] master: absent | given: created | absent @ split
+         *  [5] master: absent | given: created | absent @ split
          *      -> check out + stage
          *
-         *  --[6] master: same | given: absent | present @ split
+         *  [6] master: same | given: absent | present @ split
          *      -> file is removed and untracked
          *
-         *  -[7] master: absent | given: same | present @ split
+         *  [7] master: absent | given: same | present @ split
          *      -> remain absent
          *
          *  [8] master & given: modified in != ways | present/absent @ split
@@ -187,7 +188,6 @@ public class CommitTree {
         for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            boolean mergeCaseHappened = false;
 
 
             /**
@@ -204,32 +204,28 @@ public class CommitTree {
              *
              */
 
-            if(splitPointFiles.containsKey(key)) {
+            if (splitPointFiles.containsKey(key)) {
                 if (splitPointFiles.containsValue(value)) {
 
                     //IMPLEMENT CASE 1 AND 6
                     if (otherFiles.containsKey(key)) {
                         if (!(otherFiles.containsValue(value))) {
                             noConflictmergeCase(branch, index, key, 1);
-                            mergeCaseHappened = true;
                             //System.out.println("merge case 1");
                         }
                     } else {
                         noConflictmergeCase(branch, index, key, 6);
-                        mergeCaseHappened = true;
                         //System.out.println("merge case 6");
                     }
                 } else {
                     if (otherFiles.containsKey(key)) {
                         if (!(otherFiles.containsValue(value)) && !(otherFiles.get(key).equals(splitPointFiles.get(key)))) {
                             createConflictFile(index, branch, key, 3); // CONFLICT case III
-                            mergeCaseHappened = true;
                             conflictHappened = true;
                             //System.out.println("merge case 8 [CONFLICT 3]");
                         }
                     } else {
                         createConflictFile(index, branch, key, 4); // CONFLICT case IV
-                        mergeCaseHappened = true;
                         conflictHappened = true;
                         //System.out.println("merge case 8 [CONFLICT 4]");
                     }
@@ -238,7 +234,6 @@ public class CommitTree {
                 if (otherFiles.containsKey(key)) {
                     if (!(otherFiles.containsValue(value))) {
                         createConflictFile(index, branch, key, 1); // CONFLICT case I and II
-                        mergeCaseHappened = true;
                         conflictHappened = true;
                         //System.out.println("merge case 8 [CONFLICT 1]");
                     }
@@ -251,20 +246,12 @@ public class CommitTree {
         for (Map.Entry<String, String> entry : otherFiles.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            boolean  mergeCaseHappened = false;
 
-            /**
-             *
-             * [5] master: absent | given: created | absent @ split
-             *      -> check out + stage
-             *
-             */
 
             if (splitPointFiles.containsKey(key)) {
                 if (!splitPointFiles.containsValue(value)) {
                     if (!currentFiles.containsKey(key)) {
                         createConflictFile(index, branch, key,5); // CONFLICT case 5
-                        mergeCaseHappened = true;
                         conflictHappened = true;
                         //System.out.println("merge case 8 [CONFLICT 5]");
                     }
@@ -272,7 +259,6 @@ public class CommitTree {
             } else {
                 if (!currentFiles.containsKey(key)) {
                     noConflictmergeCase(branch, index, key,5);
-                    mergeCaseHappened = true;
                     //System.out.println("merge case 5");
                 }
             }
@@ -344,9 +330,6 @@ public class CommitTree {
     /**
      * [HELPER METHOD]
      * Returns ID of the split point.
-     *
-     * TODO: think of a way to deal with finding a split point when there was a merge commit in the commit history (occurs when a commit node
-     * has 2 parents)
      */
     public static String findSplit(Commit currentBranchHead, Commit otherBranchHead) {
         Commit currentPointer = currentBranchHead;

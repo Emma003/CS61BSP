@@ -9,13 +9,10 @@ import java.util.Set;
 
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
  *
- *  @author TODO
+ *  @author procrastin
  */
 public class Repository {
 
@@ -36,10 +33,7 @@ public class Repository {
 
 
     /**
-     *
-     * Directory map:
-     * .gitlet
-     *      InitialCommit hashcode
+     * Performs the init function
      */
     public static void init() {
         // Failure case
@@ -74,58 +68,20 @@ public class Repository {
         Stage.createIndex(setStage);
     }
 
-    public static void switchBranch(String newBranch) {
-        Utils.writeContents(HEAD, newBranch);
-    }
-
-    public static void merge(String branch) {
-        Stage index = Stage.returnIndex();
-        CommitTree.merge(branch,index);
-        Stage.saveIndex(index);
-    }
-
-
-    public static void add(String filename) {
-        Stage index = Stage.returnIndex();
-        index.add(filename);
-        Stage.saveIndex(index);
-    }
-
-    public static void commit(String message) {
-        Stage index = Stage.returnIndex();
-        CommitTree.commit(index, message, false, null);
-        Stage.saveIndex(index);
-    }
-
-    public static void rm(String filename) {
-        Stage index = Stage.returnIndex();
-        index.rm(filename);
-        Stage.saveIndex(index);
-    }
-
-    public static void status() {
-        Stage index = Stage.returnIndex();
-        index.printStatus();
-        Stage.saveIndex(index);
-    }
-
-    /** TODO: TEST THIS */
-    public static void log() {
-        String currentCommitID = CommitTree.currentCommit();
-        CommitTree.log(currentCommitID);
-    }
-
-    /** TODO: TEST THIS */
+    /**
+     * Performs the global-log function
+     */
     public static void globalLog() {
         List<String> cwdFiles = Utils.plainFilenamesIn(COMMITS);
         for (String commitID: cwdFiles) {
             Commit commit = Commit.returnCommit(commitID);
             System.out.println(commit.toString());
         }
-
     }
 
-    /** TODO: TEST THIS */
+    /**
+     * Performs the find function
+     */
     public static void find(String message) {
         // Adding all commit filenames into a list
         List<String> cwdFiles = Utils.plainFilenamesIn(COMMITS);
@@ -145,7 +101,9 @@ public class Repository {
         }
     }
 
-    /** Create split point file */
+    /**
+     * Performs the branch function
+     */
     public static void newBranch(String branchName) {
         // Branch with name already exists [FAILURE CASE]
         List<String> branches = Utils.plainFilenamesIn(BRANCHES);
@@ -162,22 +120,14 @@ public class Repository {
             e.printStackTrace();
         }
 
-        //new SPLIT file
-        File SPLIT = Utils.join(GITLET_DIR, "SPLIT");
-        if (!SPLIT.exists()) {
-            try {
-                BRANCH.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         // Write in pointer to current commit
         String currentCommitID = CommitTree.currentCommit();
         Utils.writeContents(BRANCH, currentCommitID);
-        Utils.writeContents(SPLIT, currentCommitID);
     }
 
+    /**
+     * Performs the rm-branch function
+     */
     public static void rmBranch(String branchName) {
         // Removing non-existent branch [FAILURE CASE]
         List<String> branches = Utils.plainFilenamesIn(BRANCHES);
@@ -188,7 +138,7 @@ public class Repository {
 
         // Removing current branch [FAILURE CASE]
         String currentBranch = Utils.readContentsAsString(HEAD);
-        if(currentBranch.equals(branchName)) {
+        if (currentBranch.equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
             return;
         }
@@ -199,6 +149,9 @@ public class Repository {
 
     }
 
+    /**
+     * Performs one of the checkout function
+     */
     public static void checkoutBranch(String branch, Stage index) {
         // Checking out non-existent branch [FAILURE CASE]
         List<String> branches = Utils.plainFilenamesIn(BRANCHES);
@@ -209,7 +162,7 @@ public class Repository {
 
         // Checking out current branch [FAILURE CASE]
         String currentBranch = CommitTree.currentBranch();
-        if(currentBranch.equals(branch)) {
+        if (currentBranch.equals(branch)) {
             System.out.println("No need to checkout the current branch.");
             return;
         }
@@ -231,12 +184,12 @@ public class Repository {
 
         // Put every tracked file in CWD
         Set<String> trackedFiles = headCommitAtBranch.getFiles().keySet();
-        for(String file: trackedFiles) {
+        for (String file: trackedFiles) {
             headCommitAtBranch.putFileInCWD(file);
         }
 
         // Change HEAD pointer to checked out branch
-        Utils.writeContents(Repository.HEAD,branch);
+        Utils.writeContents(Repository.HEAD, branch);
 
         // Delete previously tracked files that aren't tracked in the checked out branch
         List<String> previouslyTrackedFiles = index.getUntrackedFiles();
@@ -251,11 +204,9 @@ public class Repository {
 
     }
 
-
-
     /**
-     * TODO: Include abbreviated commit IDs
-     * */
+     * Performs the reset function
+     */
     public static void reset(String commitID, Stage index) {
         // Non-existent commit [FAILURE CASE]
         List<String> commits = Utils.plainFilenamesIn(Repository.COMMITS);
@@ -277,7 +228,7 @@ public class Repository {
         Commit commitAtGivenID = Commit.returnCommit(commitID);
         // Put every tracked file in CWD
         Set<String> trackedFiles = commitAtGivenID.getFiles().keySet();
-        for(String file: trackedFiles) {
+        for (String file: trackedFiles) {
             commitAtGivenID.putFileInCWD(file);
         }
 
@@ -296,14 +247,6 @@ public class Repository {
         index.untrackedFiles.clear();
 
     }
-
-    /** Try and have this method do the bulk of checkout(branch) and reset */
-    public static void rearrangeCWD(String commitID, Stage index) {
-
-    }
-
-
-
 
 
 }

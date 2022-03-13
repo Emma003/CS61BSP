@@ -6,20 +6,15 @@ import java.io.Serializable;
 import java.util.*;
 
 import static gitlet.Utils.join;
-import static gitlet.Utils.readContentsAsString;
 
 public class Stage implements Serializable {
 
     /** INDEX file that contains serialized staging area object*/
     static final File INDEX = join(Repository.GITLET_DIR, "INDEX.txt");
     /** addition staging area*/
-    public TreeMap<String,String> additionStage = new TreeMap<>();
+    public TreeMap<String, String> additionStage = new TreeMap<>();
     /** removal staging area*/
     public ArrayList<String> removalStage = new ArrayList<>();
-    /** tracked files with unstaged modifications*/
-    public Map<String,String> modifiedTrackedFiles = new HashMap<>();
-    /** all files that were ever committed*/
-    public Map<String,String> trackedFiles = new HashMap<>();
     /** all files in CWD that were never staged/committed*/
     public ArrayList<String> untrackedFiles = new ArrayList<>();
 
@@ -37,7 +32,7 @@ public class Stage implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Utils.writeObject(INDEX,stage);
+        Utils.writeObject(INDEX, stage);
     }
 
     public static void saveIndex(Stage stage) {
@@ -47,13 +42,12 @@ public class Stage implements Serializable {
 
     public static Stage returnIndex() {
         File inFile = INDEX;
-        return Utils.readObject(inFile,Stage.class);
+        return Utils.readObject(inFile, Stage.class);
     }
 
 
     /**
-     * TODO: TEST THIS
-     * @param filename
+     * Performs the add function
      */
     public void add(String filename) {
 
@@ -66,7 +60,7 @@ public class Stage implements Serializable {
             removalStage.remove(filename);
             currentCommit.putFileInCWD(filename);
             Blob newBlob = Blob.returnBlob(filename);
-            currentCommit.filesInCommit.put(filename,newBlob.id);
+            currentCommit.filesInCommit.put(filename, newBlob.hash());
             return;
         }
 
@@ -78,8 +72,8 @@ public class Stage implements Serializable {
 
         Blob newBlob = Blob.returnBlob(filename);
         // File version is already in current commit [FAILURE CASE]
-        if (currentCommit.isCommitVersion(filename, newBlob.id)) {
-            if(additionStage != null == additionStage.containsKey(filename)) {
+        if (currentCommit.isCommitVersion(filename, newBlob.hash())) {
+            if (additionStage != null == additionStage.containsKey(filename)) {
                 additionStage.remove(filename);
             }
             return;
@@ -88,18 +82,20 @@ public class Stage implements Serializable {
         // File is already staged [FAILURE CASE]
         if (additionStage != null) {
             if (additionStage.containsKey(filename)) {
-                additionStage.replace(filename, newBlob.id);
+                additionStage.replace(filename, newBlob.hash());
                 return;
             }
         }
 
         // Add file to addition staging area and save blob
         newBlob.saveBlob();
-        additionStage.put(filename,newBlob.id);
+        additionStage.put(filename, newBlob.hash());
 
     }
 
-    /** TODO: TEST THIS */
+    /**
+     * Performs the rm function
+     */
     public void rm(String filename) {
         // Deserialize current commit
         String currentCommitID = CommitTree.currentCommit();
@@ -136,16 +132,15 @@ public class Stage implements Serializable {
         removalStage.add(filename);
     }
 
-    /** TODO: Add functions for modified files and untracked files
-     *  TODO: UNTRACKED FILES HAS A BUG WHEN RM IS CALLED
-     *  TODO: TEST THIS
+    /**
+     * Performs the status function
      */
     public void printStatus() {
         // Print branch status
         System.out.println("=== Branches ===");
         List<String> branches = Utils.plainFilenamesIn(Repository.BRANCHES);
         for (String branch: branches) {
-            if(Utils.readContentsAsString(Repository.HEAD).equals(branch)) {
+            if (Utils.readContentsAsString(Repository.HEAD).equals(branch)) {
                 System.out.print("*");
             }
             System.out.println(branch);
@@ -153,7 +148,7 @@ public class Stage implements Serializable {
 
         // Addition stage
         System.out.println("\n=== Staged Files ===");
-        if(additionStage != null) {
+        if (additionStage != null) {
             for (String file: additionStage.keySet()) {
                 System.out.println(file);
             }
@@ -171,7 +166,7 @@ public class Stage implements Serializable {
         System.out.println("\n=== Modifications Not Staged For Commit ===");
         List<String> cwdFiles = Utils.plainFilenamesIn(Repository.CWD);
         Commit currentCommit = Commit.returnCommit(CommitTree.currentCommit());
-        TreeMap<String,String> trackedFiles = currentCommit.getFiles();
+        TreeMap<String, String> trackedFiles = currentCommit.getFiles();
 
         // Iterating over tracked files
         for (Map.Entry<String, String> entry : trackedFiles.entrySet()) {
@@ -180,7 +175,7 @@ public class Stage implements Serializable {
 
             if (cwdFiles.contains(key)) {
                 Blob cwdFileBlob = Blob.returnBlob(key);
-                if (!(cwdFileBlob.id.equals(value)) && !(additionStage.containsKey(key))) {
+                if (!(cwdFileBlob.hash().equals(value)) && !(additionStage.containsKey(key))) {
                     System.out.println(key + " (modified)");
                 }
             } else {
@@ -197,7 +192,7 @@ public class Stage implements Serializable {
 
             if (cwdFiles.contains(key)) {
                 Blob cwdFileBlob = Blob.returnBlob(key);
-                if (!(cwdFileBlob.id.equals(value)) && !(additionStage.containsKey(key))) {
+                if (!(cwdFileBlob.hash().equals(value)) && !(additionStage.containsKey(key))) {
                     System.out.println(key + " (modified)");
                 }
             } else {
@@ -233,7 +228,7 @@ public class Stage implements Serializable {
             return filesInCWD;
         }
         for (String file: filesInCWD) {
-            if(!currentCommit.getFiles().containsKey(file) && !additionStage.containsKey(file)) {
+            if (!currentCommit.getFiles().containsKey(file) && !additionStage.containsKey(file)) {
                 untrackedFiles.add(file);
             }
         }

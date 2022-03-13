@@ -1,6 +1,5 @@
 package gitlet;
 
-// TODO: any imports you need here
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
  *  @author procrastin
  */
 public class Commit implements Serializable {
@@ -29,9 +25,7 @@ public class Commit implements Serializable {
     /** Is the commit a merge commit. */
     private boolean isMergeCommit;
     /** The files tracked in this Commit. In the form <filename,blobID> */
-    public TreeMap<String,String> filesInCommit = new TreeMap<>();
-
-    /* TODO: fill in the rest of this class. */
+    public TreeMap<String, String> filesInCommit = new TreeMap<>();
 
     /** Makes initial commit (no arguments)*/
     public Commit() {
@@ -61,7 +55,6 @@ public class Commit implements Serializable {
     }
 
     /** Makes a new merge commit object
-     * TODO: finish writing this
      * */
     public Commit(String message, String parent1, String parent2, boolean isMergeCommit) {
         // Clone HEAD commit
@@ -86,7 +79,7 @@ public class Commit implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Utils.writeObject(commitFile,this);
+        Utils.writeObject(commitFile, this);
     }
 
     public static Commit returnCommit(String filename) {
@@ -103,7 +96,7 @@ public class Commit implements Serializable {
     public boolean isCommitVersion(String filename, String blob) {
         if (filesInCommit != null) {
             if (filesInCommit.containsKey(filename)) {
-                if(filesInCommit.get(filename).equals(blob)) {
+                if (filesInCommit.get(filename).equals(blob)) {
                     return true;
                 }
             }
@@ -112,22 +105,22 @@ public class Commit implements Serializable {
     }
 
     /** Iterates over addition stage files and adds/modifies/deletes from the current commit*/
-    public void updateCommitFiles (Map<String,String> stagedForAddition, ArrayList<String> stagedForRemoval) {
+    public void updateCommitFiles (Map<String, String> stagedForAddition, ArrayList<String> stagedForRemoval) {
         // Iterating over addition stage
         for (Map.Entry<String, String> entry : stagedForAddition.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            if(filesInCommit.containsKey(key)) {
-                filesInCommit.replace(key,value);
+            if (filesInCommit.containsKey(key)) {
+                filesInCommit.replace(key, value);
             } else {
-                filesInCommit.put(key,value);
+                filesInCommit.put(key, value);
             }
         }
 
         // Iterating over removal stage
         for (String file: stagedForRemoval) {
-            if(filesInCommit.containsKey(file)) {
+            if (filesInCommit.containsKey(file)) {
                 filesInCommit.remove(file);
             }
         }
@@ -150,13 +143,13 @@ public class Commit implements Serializable {
         }
 
         // Create new file in CWD and write contents
-        File currentFile = Utils.join(Repository.CWD,filename);
+        File currentFile = Utils.join(Repository.CWD, filename);
         try {
             currentFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Utils.writeContents(currentFile,fileContent);
+        Utils.writeContents(currentFile, fileContent);
     }
 
     public String getParent() {
@@ -196,7 +189,7 @@ public class Commit implements Serializable {
     @Override
     public String toString() {
         if (isMergeCommit) {
-            return "=== \ncommit " + this.id + "\nMerge: " + this.parent.substring(0,7) + " " + this.secondParent.substring(0,7) + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
+            return "=== \ncommit " + this.id + "\nMerge: " + this.parent.substring(0, 7) + " " + this.secondParent.substring(0, 7) + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
         }
         return "=== \ncommit " + this.id + "\nDate: " + this.timestamp + "\n" + this.message + "\n";
     }

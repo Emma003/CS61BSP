@@ -7,9 +7,9 @@ import java.io.Serializable;
 import static gitlet.Utils.join;
 
 public class Blob implements Serializable {
-    public String filename;
-    public String id;
-    public String contents;
+    private String filename;
+    private String id;
+    private String contents;
 
     public Blob(String filename, String contents) {
         this.filename = filename;
@@ -18,14 +18,14 @@ public class Blob implements Serializable {
         this.id = Utils.sha1(idtext);
     }
 
-    public void saveBlob(){
+    public void saveBlob() {
         File blobFile = join(Repository.BLOBS, id);
         try {
             blobFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Utils.writeObject(blobFile,contents);
+        Utils.writeObject(blobFile, contents);
     }
 
     public static Blob returnBlob(String filename) {
@@ -37,9 +37,16 @@ public class Blob implements Serializable {
     /**
      * Returns blob content at a string given blob id
      * */
-    public static String returnBlobContent(String BlobID) {
-        File inFile = join(Repository.BLOBS, BlobID);
-        String blobContents = Utils.readObject(inFile,String.class);
+    public static String returnBlobContent(String blobID) {
+        File inFile = join(Repository.BLOBS, blobID);
+        String blobContents = Utils.readObject(inFile, String.class);
         return blobContents;
+    }
+
+    /**
+     * Returns the hashcode of a blob
+     */
+    public String hash() {
+        return this.id;
     }
 }

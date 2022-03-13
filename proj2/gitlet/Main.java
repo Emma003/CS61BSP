@@ -30,31 +30,36 @@ public class Main {
         }
 
         // Gitlet hasn't been initialized -> abort
-        if(!Repository.GITLET_DIR.exists()) {
+        if (!Repository.GITLET_DIR.exists()) {
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
 
+        // Unload index file that represents the staging area
+        Stage index = Stage.returnIndex();
+
+        // Function calls
         String firstArg = args[0];
         switch(firstArg) {
             case "add":
                 validateNumArgs(args,2);
-                Repository.add(args[1]);
+                index.add(args[1]);
                 break;
             case "commit":
                 validateNumArgs(args,2);
                 if (args[1].equals("")) {
                     System.out.println("Please enter a commit message.");
                 }
-                Repository.commit(args[1]);
+                CommitTree.commit(index, args[1], false, null);
                 break;
             case "rm":
                 validateNumArgs(args,2);
-                Repository.rm(args[1]);
+                index.rm(args[1]);
                 break;
             case "log":
                 validateNumArgs(args,1);
-                Repository.log();
+                String currentCommitID = CommitTree.currentCommit();
+                CommitTree.log(currentCommitID);
                 break;
             case "global-log":
                 validateNumArgs(args,1);
@@ -66,13 +71,11 @@ public class Main {
                 break;
             case "status":
                 validateNumArgs(args,1);
-                Repository.status();
+                index.printStatus();
                 break;
             case "checkout":
                 if (args.length == 2) {
-                    Stage index = Stage.returnIndex();
                     Repository.checkoutBranch(args[1], index);
-                    Stage.saveIndex(index);
                 } else if (args.length == 3 && args[1].equals("--")) {
                     CommitTree.checkoutFile(args[2]);
                 } else if (args.length == 4 && args[2].equals("--")) {
@@ -92,17 +95,20 @@ public class Main {
                 break;
             case "reset":
                 validateNumArgs(args,2);
-                Stage index = Stage.returnIndex();
                 Repository.reset(args[1], index);
-                Stage.saveIndex(index);
                 break;
             case "merge":
                 validateNumArgs(args, 2);
-                Repository.merge(args[1]);
+                CommitTree.merge(args[1], index);
                 break;
             default:
                 System.out.println("No command with that name exists.");
+                System.exit(0);
+
         }
+
+        // Serialize the modified staging area
+        Stage.saveIndex(index);
     }
 
 
