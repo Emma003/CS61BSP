@@ -1,1 +1,3 @@
 GITLET
+
+Features implemented: init, commit, add/rm, merge (including merge conflicts) , branch, checkout, reset
