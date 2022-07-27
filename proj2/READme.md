@@ -2,7 +2,7 @@
 
 Gitlet is a local version control system designed, built and tested from scratch that implements Git features including init, commit, add/rm, status, merge, branch, log, checkout and reset.
 
-The goal of this project is to get more familiar with File I/O in Java and using the Serializable interface as well as designing and using OOP principles to build easily maintanable code.
+The goal of this project is to get more familiar with File I/O in Java and using the Serializable interface, cryptographic hashing, graph traversals as well as designing with OOP principles to build easily maintanable code.
 
 ## INIT
 ![init demo](init.gif)
