@@ -28,4 +28,6 @@ The goal of this project is to get more familiar with File I/O in Java and using
 | Persistence                                                                             | The state of the files persist in an INDEX file that stores all info about the staging area. A HEAD file contains the path to the current branch. Branches, commits and blobs folder hold branch head IDs, commit IDs and blob IDs respectively. |
 
 
+## Acknowledgements
+Adapted from a project in UC Berkeley CS 61B Data Structures, Spring 2021, taught by Josh Hug.
 
