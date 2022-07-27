@@ -4,6 +4,21 @@ Gitlet is a local version control system designed, built and tested from scratch
 
 The goal of this project is to get more familiar with File I/O in Java and using the Serializable interface as well as designing and using OOP principles to build easily maintanable code.
 
+## INIT
+![init demo](init.gif)
+
+## STATUS and ADD
+![status add demo](addnstatus.gif)
+
+## COMMIT AND LOG
+![commit demo](commitnlog.gif)
+
+## BRANCH
+![branch demo](branch.gif)
+
+## MERGE
+![merge demo](merge.gif)
+
 
 | File                                                                                    | Description                                                                                                                                                                                                                                      |
 |-----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -13,19 +28,4 @@ The goal of this project is to get more familiar with File I/O in Java and using
 | Persistence                                                                             | The state of the files persist in an INDEX file that stores all info about the staging area. A HEAD file contains the path to the current branch. Branches, commits and blobs folder hold branch head IDs, commit IDs and blob IDs respectively. |
 
 
-.gitlet
-|--- HEAD.txt
-|--- INDEX.txt
-|--- branches
-     |--- main
-     |--- branch1
-     
-|--- commits
-     |--- 93249vdf29924359dbg3245
-     |--- 234sfjd34523jvsdj432534
-     |--- ...
-     
-|--- blobs
-     |--- s345j2h353jh452345j23j4
-     |--- fj2345j2345n4523k4j5239
-     |--- ...
+
