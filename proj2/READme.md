@@ -10,13 +10,13 @@ The goal of this project is to get more familiar with File I/O in Java and using
 ## STATUS and ADD
 ![status add demo](addnstatus.gif)
 
-## COMMIT AND LOG
+## COMMIT 
 ![commit demo](commitnlog.gif)
 
 ## BRANCH
 ![branch demo](branch.gif)
 
-## MERGE
+## MERGE and LOG
 ![merge demo](merge.gif)
 
 
